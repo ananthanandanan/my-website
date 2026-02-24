@@ -1,0 +1,24 @@
+---
+title: "VPS Setup Checklist"
+date: "2024-12-28"
+tags: ["linux", "devops", "self-host"]
+draft: false
+summary: "The general checklist I come back to every time I set up a new server."
+authors: ["default"]
+---
+
+A short reference for bringing up a new VPS: users, SSH, firewall, and basics.
+
+## 1. Create a non-root user
+
+Always avoid running as root for day-to-day work.
+
+## 2. SSH hardening
+
+Disable password auth, use keys only.
+
+## 3. Firewall
+
+UFW or nftables, allow only what you need.
+
+That's the core. The rest is app-specific.

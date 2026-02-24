@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
+/* ─── DESIGN TOKENS (from mockup + .pen) ─────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #09090b;
+  --bg-soft: #0d0f12;
+  --surface: #111318;
+  --surface-2: #161a20;
+  --border: #1e2229;
+  --border-soft: #181c22;
+
+  --text: #ede8e1;
+  --text-mid: #a8a29e;
+  --text-dim: #5a6070;
+  --warm: #f5f0ea;
+
+  --accent: #4a9eff;
+  --accent-dim: rgba(74, 158, 255, 0.12);
+  --accent-glow: rgba(74, 158, 255, 0.22);
+  --amber: #f5a623;
+  --amber-dim: rgba(245, 166, 35, 0.1);
+
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
 }
 
+/* Tailwind 4 theme: map CSS variables for utility classes */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-text: var(--text);
+  --color-text-mid: var(--text-mid);
+  --color-text-dim: var(--text-dim);
+  --color-warm: var(--warm);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-amber: var(--amber);
+  --color-amber-dim: var(--amber-dim);
+  --font-serif: var(--font-libre-baskerville);
+  --font-mono: var(--font-dm-mono);
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 14px;
+  width: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  min-width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-dm-mono), ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Optional noise/grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.35;
+}
+
+/* Prose line-height for long-form */
+.prose-body {
+  line-height: 1.9;
+}
+
+/* ─── Post prose (single blog post) ──────────────────────── */
+.prose-post {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--text-mid);
+}
+.prose-post h2 {
+  font-family: var(--font-libre-baskerville), serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--warm);
+  margin: 2.5rem 0 1rem;
+  letter-spacing: -0.01em;
+}
+.prose-post h3 {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-mid);
+  margin: 2rem 0 0.8rem;
+}
+.prose-post p {
+  margin-bottom: 1.2rem;
+}
+.prose-post a {
+  color: var(--accent);
+  border-bottom: 1px solid rgba(74, 158, 255, 0.3);
+  text-decoration: none;
+}
+.prose-post a:hover {
+  border-color: var(--accent);
+}
+.prose-post strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.prose-post code {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+  font-size: 12px;
+  color: var(--amber);
+  font-family: var(--font-dm-mono), ui-monospace, monospace;
+}
+.prose-post pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  padding: 1.2rem 1rem;
+}
+.prose-post pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.65;
+}
+.prose-post blockquote {
+  border-left: 2px solid var(--accent);
+  padding: 0.8rem 1.2rem;
+  margin: 1.5rem 0;
+  background: var(--accent-dim);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.prose-post blockquote p {
+  color: var(--text);
+  margin-bottom: 0;
+  font-style: italic;
+}
+.prose-post ul, .prose-post ol {
+  margin-bottom: 1.2rem;
+  padding-left: 1.5rem;
+}
+.prose-post li {
+  margin-bottom: 0.4rem;
 }

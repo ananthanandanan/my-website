@@ -51,7 +51,7 @@
 html {
   box-sizing: border-box;
   scroll-behavior: smooth;
-  font-size: 14px;
+  font-size: 15px;
   width: 100%;
 }
 
@@ -66,8 +66,8 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-dm-mono), ui-monospace, monospace;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -90,20 +90,20 @@ body::before {
 
 /* ─── Post prose (single blog post) ──────────────────────── */
 .prose-post {
-  font-size: 13.5px;
-  line-height: 1.9;
+  font-size: 15px;
+  line-height: 1.92;
   color: var(--text-mid);
 }
 .prose-post h2 {
   font-family: var(--font-libre-baskerville), serif;
-  font-size: 1.2rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--warm);
   margin: 2.5rem 0 1rem;
   letter-spacing: -0.01em;
 }
 .prose-post h3 {
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-mid);
@@ -129,7 +129,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 1px 5px;
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--amber);
   font-family: var(--font-dm-mono), ui-monospace, monospace;
 }
@@ -146,7 +146,7 @@ body::before {
   border: none;
   padding: 0;
   color: var(--text);
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.65;
 }
 .prose-post blockquote {

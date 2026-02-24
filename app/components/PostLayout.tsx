@@ -27,7 +27,7 @@ export function PostLayout({
         <article>
           <header className="pb-10 pt-16">
             <div
-              className="mb-4 flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-accent"
+              className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
               style={{ letterSpacing: "0.22em" }}
             >
               <span
@@ -44,14 +44,14 @@ export function PostLayout({
                 </Link>
               ))}
             </div>
-            <h1 className="font-(family-name:--font-libre-baskerville) mb-4 text-[clamp(1.6rem,4vw,2.2rem)] font-bold leading-[1.22] tracking-tight text-warm">
+            <h1 className="font-(family-name:--font-libre-baskerville) mb-5 text-[clamp(2rem,4vw,2.45rem)] font-bold leading-[1.2] tracking-tight text-warm">
               {meta.title}
             </h1>
-            <div className="mb-5 flex items-center gap-6 text-[10px] uppercase tracking-widest text-text-dim">
+            <div className="mb-6 flex items-center gap-6 text-[11px] uppercase tracking-[0.14em] text-text-dim">
               <span>{formattedDate}</span>
               <span>{readingTimeText}</span>
             </div>
-            <p className="mb-8 border-l-2 border-border pl-5 text-[13px] leading-[1.85] text-text-mid">
+            <p className="mb-8 border-l-2 border-border pl-5 text-[14.5px] leading-[1.85] text-text-mid">
               {meta.summary}
             </p>
           </header>

@@ -6,16 +6,23 @@ const WRAP = "mx-auto max-w-[680px] px-6 sm:px-8";
 export default function ProjectsPage() {
   return (
     <div className={WRAP}>
-      <header className="mb-10 pt-8">
-        <h1 className="font-(family-name:--font-libre-baskerville) text-2xl font-bold text-warm">
+      <header className="mb-12 pt-16">
+        <div
+          className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
+          style={{ letterSpacing: "0.2em" }}
+        >
+          <span className="inline-block h-px w-5 bg-accent opacity-60" aria-hidden />
           Projects
+        </div>
+        <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(1.95rem,3.4vw,2.25rem)] leading-[1.2] font-bold text-warm">
+          Things I&apos;ve built
         </h1>
-        <p className="mt-2 text-[13px] text-text-mid">
-          Things I&apos;ve built or contributed to.
+        <p className="mt-2 text-[13.5px] tracking-[0.02em] text-text-mid">
+          A mix of live products, tools, and experiments.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2">
         {projectsData.map((p) => (
           <ProjectCard key={p.title} project={p} />
         ))}

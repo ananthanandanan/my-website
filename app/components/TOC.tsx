@@ -29,7 +29,7 @@ export function TOC({ items }: { items: TocItem[] }) {
 
   return (
     <nav className="sticky top-20" aria-label="On this page">
-      <div className="mb-4 text-[9px] uppercase tracking-[0.18em] text-text-dim">
+      <div className="mb-4 text-[10px] uppercase tracking-[0.16em] text-text-dim">
         On this page
       </div>
       <ul className="list-none">
@@ -40,8 +40,8 @@ export function TOC({ items }: { items: TocItem[] }) {
           >
             <a
               href={`#${item.id}`}
-              className={`block py-0.5 pl-3 text-[11px] no-underline border-l border-border transition-colors hover:text-accent hover:border-accent leading-snug ${
-                item.level === 3 ? "text-[10.5px] opacity-80" : ""
+              className={`block py-0.5 pl-3 text-[12px] no-underline border-l border-border transition-colors hover:text-accent hover:border-accent leading-snug ${
+                item.level === 3 ? "text-[11.5px] opacity-80" : ""
               } ${activeId === item.id ? "text-accent border-accent" : "text-text-dim"}`}
             >
               {item.text}

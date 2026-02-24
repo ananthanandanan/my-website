@@ -1,15 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { headerNavLinks } from "@/lib/headerNavLinks";
 
 const navMaxWidth = "max-w-[680px]";
 const navPadding = "px-6 sm:px-8";
 
 export function Nav({ wide: wideProp }: { wide?: boolean }) {
-  const pathname = usePathname();
-  const wide = wideProp ?? pathname?.startsWith("/blog/") ?? false;
+  const wide = wideProp ?? false;
   return (
     <nav
       className="sticky top-0 z-100 w-full bg-linear-to-b from-bg/95 to-transparent backdrop-blur-sm"
@@ -28,7 +26,7 @@ export function Nav({ wide: wideProp }: { wide?: boolean }) {
               <li key={href}>
                 <Link
                   href={href}
-                  className="text-[10px] uppercase tracking-[0.14em] text-text-dim no-underline transition-colors hover:text-text-mid"
+                  className="text-[11px] uppercase tracking-[0.12em] text-text-dim no-underline transition-colors hover:text-text-mid"
                 >
                   {title}
                 </Link>
@@ -37,7 +35,7 @@ export function Nav({ wide: wideProp }: { wide?: boolean }) {
             <li>
               <a
                 href="/feed.xml"
-                className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-amber no-underline opacity-70 transition-opacity hover:opacity-100"
+                className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] text-amber no-underline opacity-70 transition-opacity hover:opacity-100"
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse"

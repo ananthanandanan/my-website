@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { siteMetadata } from "@/lib/siteMetadata";
 
-const wrapMaxWidth = "max-w-[680px]";
 const wrapPadding = "px-6 sm:px-8";
 
 const socialIcons: Record<string, { path: string }> = {
@@ -34,10 +33,10 @@ function SocialIcon({ icon }: { icon: string }) {
   );
 }
 
-export function Footer() {
+export function Footer({ wide = false }: { wide?: boolean }) {
   return (
     <footer className="w-full">
-      <div className={`mx-auto w-full ${wrapPadding} ${wrapMaxWidth} pb-12 pt-8`}>
+      <div className={`mx-auto w-full ${wrapPadding} ${wide ? "max-w-[920px]" : "max-w-[680px]"} pb-12 pt-8`}>
         <div className="mb-5 flex items-center justify-between">
           <div className="font-(family-name:--font-libre-baskerville) italic text-[0.95rem] tracking-[0.01em] text-text-mid">
             {siteMetadata.author}
@@ -56,7 +55,7 @@ export function Footer() {
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border pt-4">
-          <div className="flex items-center gap-2 text-[11px] tracking-[0.03em] text-text-mid">
+          <div className="flex items-center gap-2 text-[12px] tracking-[0.02em] text-text-mid">
             <Link
               href="/blog/steal-this-post"
               className="text-accent no-underline border-b border-accent/25 transition-[border-color] hover:border-accent"
@@ -64,11 +63,26 @@ export function Footer() {
               Steal this post
             </Link>
             <span className="text-text-dim opacity-40">·</span>
-            <span>CC BY 4.0</span>
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent no-underline border-b border-accent/25 transition-[border-color] hover:border-accent"
+            >
+              CC BY 4.0
+            </a>
             <span className="text-text-dim opacity-40">·</span>
-            <span>MIT</span>
+            <span>Code</span>
+            <a
+              href={`${siteMetadata.siteRepo}/blob/main/LICENSE`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-accent no-underline border-b border-accent/25 transition-[border-color] hover:border-accent"
+            >
+              MIT
+            </a>
           </div>
-          <div className="text-[10px] tracking-[0.08em] text-text-mid">
+          <div className="text-[11px] tracking-[0.06em] text-text-mid">
             © 2026 · Kerala, India
           </div>
         </div>

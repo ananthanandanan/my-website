@@ -29,7 +29,7 @@ export function Hero() {
   return (
     <section className="pt-20">
       <div
-        className="mb-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-accent"
+        className="mb-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
         style={{ letterSpacing: "0.22em" }}
       >
         <span
@@ -47,7 +47,7 @@ export function Hero() {
           aria-hidden
         />
       </h1>
-      <div className="mb-9 max-w-[520px] text-[13px] leading-[1.9] text-text-mid">
+      <div className="mb-9 max-w-[560px] text-[14.5px] leading-[1.9] text-text-mid">
         <p className="[&+p]:mt-[0.9rem]">
           I&apos;m K N Anantha Nandanan — a software engineer focused on scalable
           backend systems, DevOps, and applied AI. Currently building{" "}
@@ -70,7 +70,7 @@ export function Hero() {
           <a
             key={s.name}
             href={s.href}
-            className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.12em] text-text-dim no-underline transition-colors hover:text-text-mid"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.1em] text-text-dim no-underline transition-colors hover:text-text-mid"
           >
             <SocialIcon icon={s.icon} />
             {s.name}

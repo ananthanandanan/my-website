@@ -48,20 +48,19 @@
   --radius-lg: var(--r-lg);
 }
 
-/* Base */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 html {
+  box-sizing: border-box;
   scroll-behavior: smooth;
   font-size: 14px;
   width: 100%;
 }
 
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
 body {
+  margin: 0;
   width: 100%;
   min-width: 100%;
   background: var(--bg);

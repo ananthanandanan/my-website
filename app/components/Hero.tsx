@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { siteMetadata } from "@/lib/siteMetadata";
 
 const socialIcons: Record<string, { path: string }> = {
@@ -49,16 +48,10 @@ export function Hero() {
       </h1>
       <div className="mb-9 max-w-[560px] text-[14.5px] leading-[1.9] text-text-mid">
         <p className="[&+p]:mt-[0.9rem]">
-          I&apos;m K N Anantha Nandanan — a software engineer focused on scalable
-          backend systems, DevOps, and applied AI. Currently building{" "}
-          <Link
-            href="/projects"
-            className="text-accent no-underline border-b border-accent/30 transition-[border-color] hover:border-accent"
-          >
-            QuestCraft
-          </Link>
-          , an LLM-powered platform that helps teachers create better
-          assessments, faster.
+          I&apos;m <span className="text-accent">K N Anantha Nandanan</span> — a
+          software engineer focused on scalable backend systems, DevOps, and
+          applied AI. Currently building QuestCraft, an LLM-powered platform
+          that helps teachers create better assessments, faster.
         </p>
         <p>
           I write about things I learn, systems I build, and patterns worth
@@ -70,7 +63,7 @@ export function Hero() {
           <a
             key={s.name}
             href={s.href}
-            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.1em] text-text-dim no-underline transition-colors hover:text-text-mid"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-text-dim no-underline transition-colors hover:text-text-mid"
           >
             <SocialIcon icon={s.icon} />
             {s.name}

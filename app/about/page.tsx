@@ -45,13 +45,19 @@ const usesGroups = [
   {
     label: "OS · Hardware",
     items: [
-      { name: "Arch Linux", desc: "Daily driver. I like knowing what's running." },
+      {
+        name: "Arch Linux",
+        desc: "Daily driver. I like knowing what's running.",
+      },
     ],
   },
   {
     label: "Services",
     items: [
-      { name: "Plausible", desc: "Analytics. Privacy-first, no cookie banners." },
+      {
+        name: "Plausible",
+        desc: "Analytics. Privacy-first, no cookie banners.",
+      },
     ],
   },
 ];
@@ -64,16 +70,19 @@ export default function AboutPage() {
           className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
           style={{ letterSpacing: "0.2em" }}
         >
-          <span className="inline-block h-px w-5 bg-accent opacity-60" aria-hidden />
+          <span
+            className="inline-block h-px w-5 bg-accent opacity-60"
+            aria-hidden
+          />
           About
         </div>
         <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.6vw,2.35rem)] leading-[1.2] font-bold text-warm">
           K N Anantha Nandanan
         </h1>
-        <p className="mt-2 text-[11.5px] uppercase tracking-[0.16em] text-text-dim">
+        <p className="mt-2 text-[12.5px] uppercase tracking-[0.14em] text-text-dim">
           Backend Engineer · Kerala, India
         </p>
-        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3 py-1 text-[10.5px] uppercase tracking-[0.12em] text-[#7bdc9f]">
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 text-[11.5px] uppercase tracking-widest text-[#7bdc9f]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#2ecc71]" aria-hidden />
           Open to opportunities
         </div>
@@ -83,7 +92,7 @@ export default function AboutPage() {
         {/* Now Card */}
         <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="px-6 pt-6 pb-1">
-            <div className="mb-1.5 flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] text-accent">
+            <div className="mb-1.5 flex items-center gap-2 text-[10.5px] uppercase tracking-[0.18em] text-accent">
               <span className="inline-block h-px w-4 bg-border" aria-hidden />
               Now
             </div>
@@ -94,10 +103,10 @@ export default function AboutPage() {
                 key={label}
                 className="grid grid-cols-[80px_1fr] gap-4 py-2 px-2 first:pt-2"
               >
-                <div className="text-[10px] uppercase tracking-[0.16em] text-text-dim">
+                <div className="text-[11px] uppercase tracking-[0.14em] text-text-dim">
                   {label}
                 </div>
-                <div className="text-[12px] leading-[1.6] text-text-mid">
+                <div className="text-[14px] leading-[1.75] text-text-mid">
                   {value}
                 </div>
               </div>
@@ -107,29 +116,32 @@ export default function AboutPage() {
 
         {/* Bio Card */}
         <div className="rounded-xl border border-border bg-surface p-7">
-          <p className="mb-4 text-[12.5px] leading-[1.9] text-text-mid">
-            I&apos;m K N Anantha Nandanan — a software engineer focused on scalable
-            backend systems and applying AI to real problems. I&apos;ve spent the last
-            few years working across Django, FastAPI, and LangChain — most recently on
-            QuestCraft, an LLM-powered assessment platform for teachers.
+          <p className="mb-4 text-[14.5px] leading-[1.9] text-text-mid">
+            I&apos;m K N Anantha Nandanan — a software engineer focused on
+            scalable backend systems and applying AI to real problems. I&apos;ve
+            spent the last few years working across Django, FastAPI, and
+            LangChain — most recently on QuestCraft, an LLM-powered assessment
+            platform for teachers.
           </p>
-          <p className="mb-4 text-[12.5px] leading-[1.9] text-text-mid">
-            Before that, I worked on infrastructure, DevOps, and self-hosted tooling —
-            the kind of work that keeps everything else running. I care about systems
-            that are legible, observable, and honest about their failure modes.
+          <p className="mb-4 text-[14.5px] leading-[1.9] text-text-mid">
+            Before that, I worked on infrastructure, DevOps, and self-hosted
+            tooling — the kind of work that keeps everything else running. I
+            care about systems that are legible, observable, and honest about
+            their failure modes.
           </p>
-          <p className="mb-6 text-[12.5px] leading-[1.9] text-text-mid">
-            When I&apos;m not building, I write about what I&apos;m learning here. I believe
-            in small, sharp tools, slow reading, and shipping things that actually work.
+          <p className="mb-6 text-[14.5px] leading-[1.9] text-text-mid">
+            When I&apos;m not building, I write about what I&apos;m learning
+            here. I believe in small, sharp tools, slow reading, and shipping
+            things that actually work.
           </p>
 
-          <div className="mb-3 text-[9px] uppercase tracking-[0.2em] text-text-dim">
+          <div className="mb-3 text-[10px] uppercase tracking-[0.18em] text-text-dim">
             Stack
           </div>
           <div className="flex flex-col gap-3.5">
             {stackGroups.map((group) => (
               <div key={group.label} className="flex flex-col gap-2">
-                <div className="text-[8px] uppercase tracking-[0.2em] text-text-dim">
+                <div className="text-[9.5px] uppercase tracking-[0.18em] text-text-dim">
                   {group.label}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -138,8 +150,8 @@ export default function AboutPage() {
                       key={tag}
                       className={
                         group.accent
-                          ? "rounded-full border border-[#4a9eff33] bg-accent-dim px-3 py-1 text-[10px] tracking-[0.06em] text-accent"
-                          : "rounded-full border border-border bg-surface-2 px-3 py-1 text-[10px] tracking-[0.06em] text-text-mid transition-colors hover:border-accent hover:text-accent"
+                          ? "rounded-full border border-[#4a9eff33] bg-accent-dim px-3 py-1 text-[11px] tracking-[0.05em] text-accent"
+                          : "rounded-full border border-border bg-surface-2 px-3 py-1 text-[11px] tracking-[0.05em] text-text-mid transition-colors hover:border-accent hover:text-accent"
                       }
                     >
                       {tag}
@@ -154,7 +166,7 @@ export default function AboutPage() {
         {/* Beliefs Card */}
         <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="px-6 pt-6 pb-1">
-            <div className="mb-1.5 flex items-center gap-2 text-[9px] uppercase tracking-[0.2em] text-accent">
+            <div className="mb-1.5 flex items-center gap-2 text-[10.5px] uppercase tracking-[0.18em] text-accent">
               <span className="inline-block h-px w-4 bg-border" aria-hidden />
               Things I believe
             </div>
@@ -163,9 +175,9 @@ export default function AboutPage() {
             {beliefs.map((item, i) => (
               <div
                 key={item}
-                className="flex gap-3 py-2 px-2 text-[12px] leading-[1.7] first:pt-2"
+                className="flex gap-3 py-2 px-2 text-[14px] leading-[1.8] first:pt-2"
               >
-                <span className="w-5 shrink-0 text-[10px] text-accent">
+                <span className="w-5 shrink-0 text-[11px] text-accent">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="text-text-mid">{item}</span>
@@ -185,7 +197,7 @@ export default function AboutPage() {
                   : "px-5 py-3.5"
               }
             >
-              <div className="mb-2 text-[9px] uppercase tracking-[0.2em] text-text-dim">
+              <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-text-dim">
                 {group.label}
               </div>
               <div className="flex flex-col gap-2">
@@ -194,10 +206,10 @@ export default function AboutPage() {
                     key={name}
                     className="flex flex-wrap gap-2 gap-y-0.5 sm:flex-nowrap sm:gap-4"
                   >
-                    <span className="shrink-0 text-[12px] text-[#f5a623]">
+                    <span className="shrink-0 text-[13px] text-[#f5a623]">
                       {name}
                     </span>
-                    <span className="text-[11.5px] leading-[1.55] text-text-dim">
+                    <span className="text-[13.5px] leading-[1.65] text-text-dim">
                       {desc}
                     </span>
                   </div>
@@ -212,7 +224,7 @@ export default function AboutPage() {
             <a
               key={s.name}
               href={s.href}
-              className="text-[11px] uppercase tracking-[0.12em] text-text-dim no-underline transition-colors hover:text-accent"
+              className="text-[12px] uppercase tracking-widest text-text-dim no-underline transition-colors hover:text-accent"
             >
               {s.name}
             </a>

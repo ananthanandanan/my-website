@@ -28,7 +28,7 @@ export function Hero() {
   return (
     <section className="pt-20">
       <div
-        className="mb-6 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
+        className="type-eyebrow mb-6 flex items-center gap-3 text-accent"
         style={{ letterSpacing: "0.22em" }}
       >
         <span
@@ -37,7 +37,7 @@ export function Hero() {
         />
         Kerala, India · Backend Engineer
       </div>
-      <h1 className="font-(family-name:--font-libre-baskerville) mb-6 text-warm text-[clamp(2rem,5.5vw,2.8rem)] font-bold leading-[1.18] tracking-tight">
+      <h1 className="type-hero font-(family-name:--font-libre-baskerville) mb-6 text-warm font-bold">
         Building software that
         <br />
         <em className="text-text">actually works</em> at scale.
@@ -46,7 +46,7 @@ export function Hero() {
           aria-hidden
         />
       </h1>
-      <div className="mb-9 max-w-[560px] text-[14.5px] leading-[1.9] text-text-mid">
+      <div className="measure-readable mb-9 type-lead">
         <p className="[&+p]:mt-[0.9rem]">
           I&apos;m <span className="text-accent">K N Anantha Nandanan</span> — a
           software engineer focused on scalable backend systems, DevOps, and
@@ -63,7 +63,7 @@ export function Hero() {
           <a
             key={s.name}
             href={s.href}
-            className="flex items-center gap-1.5 text-[11px] uppercase tracking-widest text-text-dim no-underline transition-colors hover:text-text-mid"
+            className="type-meta flex items-center gap-1.5 uppercase tracking-[0.12em] text-text-dim no-underline transition-colors hover:text-text-mid"
           >
             <SocialIcon icon={s.icon} />
             {s.name}

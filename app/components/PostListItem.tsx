@@ -5,8 +5,8 @@ import type { PostMeta } from "@/lib/blog";
 
 export function PostListItem({ post }: { post: PostMeta }) {
   return (
-    <li className="grid grid-cols-[52px_1fr] gap-x-5 rounded-sm border-b border-border-soft py-5 pr-2 pl-2 -mx-2 first:border-t first:border-border-soft group/list hover:bg-white/[0.018]">
-      <span className="pt-0.5 text-[11px] tracking-[0.04em] text-text-dim whitespace-nowrap tabular-nums">
+    <li className="grid grid-cols-[66px_1fr] gap-x-5 rounded-sm border-b border-border-soft py-5 pr-2 pl-2 -mx-2 first:border-t first:border-border-soft group/list hover:bg-white/[0.018]">
+      <span className="type-meta pt-0.5 tracking-[0.04em] whitespace-nowrap tabular-nums">
         {formatDate(post.date)}
       </span>
       <div className="flex flex-col gap-1 min-w-0">
@@ -14,10 +14,10 @@ export function PostListItem({ post }: { post: PostMeta }) {
           href={`/blog/${post.slug}`}
           className="text-inherit no-underline group/post"
         >
-          <span className="block text-[15px] leading-snug text-warm transition-colors group-hover/list:text-accent">
+          <span className="type-title block transition-colors group-hover/list:text-accent">
             {post.title}
           </span>
-          <span className="mt-0.5 block text-[13px] leading-relaxed text-text-mid">
+          <span className="type-body mt-0.5 block measure-readable">
             {post.summary}
           </span>
         </Link>

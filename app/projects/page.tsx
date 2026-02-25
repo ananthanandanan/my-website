@@ -8,7 +8,7 @@ export default function ProjectsPage() {
     <div className={WRAP}>
       <header className="mb-12 pt-16">
         <div
-          className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
+          className="type-eyebrow mb-3 flex items-center gap-3 text-accent"
           style={{ letterSpacing: "0.2em" }}
         >
           <span className="inline-block h-px w-5 bg-accent opacity-60" aria-hidden />
@@ -17,7 +17,7 @@ export default function ProjectsPage() {
         <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(1.95rem,3.4vw,2.25rem)] leading-[1.2] font-bold text-warm">
           Things I&apos;ve built
         </h1>
-        <p className="mt-2 text-[13.5px] tracking-[0.02em] text-text-mid">
+        <p className="type-lead measure-readable mt-2">
           A mix of live products, tools, and experiments.
         </p>
       </header>

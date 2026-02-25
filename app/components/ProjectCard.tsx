@@ -7,19 +7,19 @@ export function ProjectCard({ project }: { project: Project }) {
   return (
     <Link
       href={project.href}
-      className="flex flex-col gap-2.5 bg-surface p-5 text-inherit no-underline transition-colors hover:bg-surface-2"
+      className="flex flex-col gap-3 bg-surface p-6 text-inherit no-underline transition-colors hover:bg-surface-2"
     >
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.1em] text-text-dim">
+      <div className="type-meta flex items-center gap-1.5 uppercase tracking-[0.1em] text-text-dim">
         <span
           className={`h-1.5 w-1.5 rounded-full ${live ? "bg-[#2ecc71] animate-pulse" : "bg-text-dim"}`}
           aria-hidden
         />
         {live ? "Live" : "Archive"}
       </div>
-      <div className="font-(family-name:--font-libre-baskerville) text-[1.05rem] leading-snug text-warm">
+      <div className="type-title font-(family-name:--font-libre-baskerville)">
         {project.title}
       </div>
-      <p className="flex-1 text-[13px] leading-[1.7] text-text-mid">
+      <p className="type-body measure-readable flex-1">
         {project.description}
       </p>
       <div className="mt-0.5 flex flex-wrap gap-1.5">

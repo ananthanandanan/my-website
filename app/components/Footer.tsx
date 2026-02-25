@@ -38,7 +38,7 @@ export function Footer({ wide: _wide = false }: { wide?: boolean }) {
     <footer className="w-full">
       <div className={`mx-auto w-full ${wrapPadding} max-w-[1150px] pb-12 pt-8`}>
         <div className="mb-5 flex items-center justify-between">
-          <div className="font-(family-name:--font-libre-baskerville) italic text-[0.95rem] tracking-[0.01em] text-text-mid">
+          <div className="font-(family-name:--font-libre-baskerville) italic text-[1.05rem] tracking-[0.01em] text-text-mid">
             {siteMetadata.author}
           </div>
           <div className="flex items-center gap-5">
@@ -55,7 +55,7 @@ export function Footer({ wide: _wide = false }: { wide?: boolean }) {
           </div>
         </div>
         <div className="flex items-center justify-between border-t border-border pt-4">
-          <div className="flex items-center gap-2 text-[12px] tracking-[0.02em] text-text-mid">
+          <div className="type-body flex items-center gap-2 tracking-[0.02em] text-text-mid">
             <Link
               href="/blog/steal-this-post"
               className="text-accent no-underline border-b border-accent/25 transition-[border-color] hover:border-accent"
@@ -82,7 +82,7 @@ export function Footer({ wide: _wide = false }: { wide?: boolean }) {
               MIT
             </a>
           </div>
-          <div className="text-[11px] tracking-[0.06em] text-text-mid">
+          <div className="type-meta tracking-[0.08em] text-text-mid">
             © 2026 · Kerala, India
           </div>
         </div>

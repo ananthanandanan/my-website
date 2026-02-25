@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { PostListItem } from "@/app/components/PostListItem";
-import { Tag } from "@/app/components/Tag";
 import type { PostMeta } from "@/lib/blog";
 import type { getAllTagsFromPosts } from "@/lib/tags";
 
@@ -70,7 +69,7 @@ export function PostsListClient({
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="w-full bg-surface border border-border rounded-md py-3 pl-11 pr-4 text-text font-mono text-sm outline-none transition-[border-color] focus:border-[rgba(74,158,255,.4)]"
+          className="w-full rounded-md border border-border bg-surface py-3.5 pl-11 pr-4 font-mono text-[1rem] text-text outline-none transition-[border-color] focus:border-[rgba(74,158,255,.4)]"
         />
       </div>
 
@@ -81,10 +80,10 @@ export function PostsListClient({
             setActiveTag(null);
             setPage(1);
           }}
-          className={`text-[10px] tracking-[0.08em] lowercase py-0.5 px-3 rounded-full border font-mono cursor-pointer transition-all ${
-            activeTag === null
-              ? "border-[rgba(74,158,255,.4)] text-accent bg-accent-dim"
-              : "border-border text-text-dim bg-transparent hover:border-[rgba(74,158,255,.4)] hover:text-accent hover:bg-accent-dim"
+            className={`type-chip rounded-full border px-3 py-1 lowercase font-mono cursor-pointer transition-all ${
+              activeTag === null
+                ? "border-[rgba(74,158,255,.4)] text-accent bg-accent-dim"
+                : "border-border text-text-dim bg-transparent hover:border-[rgba(74,158,255,.4)] hover:text-accent hover:bg-accent-dim"
           }`}
         >
           all
@@ -97,7 +96,7 @@ export function PostsListClient({
               setActiveTag(normalized);
               setPage(1);
             }}
-            className={`text-[10px] tracking-[0.08em] lowercase py-0.5 px-3 rounded-full border font-mono cursor-pointer transition-all ${
+            className={`type-chip rounded-full border px-3 py-1 lowercase font-mono cursor-pointer transition-all ${
               activeTag === normalized
                 ? "border-[rgba(74,158,255,.4)] text-accent bg-accent-dim"
                 : "border-border text-text-dim bg-transparent hover:border-[rgba(74,158,255,.4)] hover:text-accent hover:bg-accent-dim"
@@ -123,18 +122,18 @@ export function PostsListClient({
             type="button"
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="text-[10px] uppercase tracking-widest text-text-dim disabled:opacity-40 cursor-pointer hover:text-accent"
+            className="type-meta uppercase tracking-[0.15em] text-text-dim disabled:opacity-40 cursor-pointer hover:text-accent"
           >
             ← Newer
           </button>
-          <span className="text-[11px] text-text-mid">
+          <span className="type-meta text-text-mid">
             Page {page} of {totalFilteredPages}
           </span>
           <button
             type="button"
             onClick={() => setPage((p) => Math.min(totalFilteredPages, p + 1))}
             disabled={page >= totalFilteredPages}
-            className="text-[10px] uppercase tracking-widest text-text-dim disabled:opacity-40 cursor-pointer hover:text-accent"
+            className="type-meta uppercase tracking-[0.15em] text-text-dim disabled:opacity-40 cursor-pointer hover:text-accent"
           >
             Older →
           </button>

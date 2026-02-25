@@ -5,7 +5,7 @@ import { TOC } from "./TOC";
 import type { PostMeta } from "@/lib/blog";
 import type { TocItem } from "@/lib/toc";
 
-const WRAP = "mx-auto max-w-[920px] px-6 sm:px-8";
+const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 
 export function PostLayout({
   meta,

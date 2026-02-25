@@ -1,6 +1,6 @@
 import { siteMetadata } from "@/lib/siteMetadata";
 
-const WRAP = "mx-auto max-w-[680px] px-6 sm:px-8";
+const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 
 const nowItems = [
   ["Building", "QuestCraft — LLM-powered assessment platform for teachers"],

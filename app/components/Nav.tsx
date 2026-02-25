@@ -3,16 +3,15 @@
 import Link from "next/link";
 import { headerNavLinks } from "@/lib/headerNavLinks";
 
-const navMaxWidth = "max-w-[680px]";
+const navMaxWidth = "max-w-[1150px]";
 const navPadding = "px-6 sm:px-8";
 
-export function Nav({ wide: wideProp }: { wide?: boolean }) {
-  const wide = wideProp ?? false;
+export function Nav({ wide: _wideProp }: { wide?: boolean }) {
   return (
     <nav
       className="sticky top-0 z-100 w-full bg-linear-to-b from-bg/95 to-transparent backdrop-blur-sm"
     >
-      <div className={`mx-auto w-full ${wide ? "max-w-[920px]" : navMaxWidth} ${navPadding} py-[1.1rem]`}>
+      <div className={`mx-auto w-full ${navMaxWidth} ${navPadding} py-[1.1rem]`}>
         <div className="flex items-center justify-between">
           <Link
             href="/"
@@ -21,12 +20,12 @@ export function Nav({ wide: wideProp }: { wide?: boolean }) {
             A<span className="text-accent not-italic">.</span>N
             <span className="text-accent not-italic">.</span>K
           </Link>
-          <ul className="flex list-none items-center gap-8">
+          <ul className="flex list-none items-center gap-2 sm:gap-3">
             {headerNavLinks.map(({ href, title }) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="text-[11px] uppercase tracking-[0.12em] text-text-dim no-underline transition-colors hover:text-text-mid"
+                  className="inline-flex items-center px-4 py-2 text-[1rem] sm:text-[1.12rem] uppercase tracking-[0.08em] text-text-dim no-underline transition-colors hover:text-text-mid"
                 >
                   {title}
                 </Link>
@@ -35,7 +34,7 @@ export function Nav({ wide: wideProp }: { wide?: boolean }) {
             <li>
               <a
                 href="/feed.xml"
-                className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] text-amber no-underline opacity-70 transition-opacity hover:opacity-100"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-[1rem] sm:text-[1.12rem] uppercase tracking-[0.08em] text-amber no-underline opacity-70 transition-opacity hover:opacity-100"
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full bg-amber animate-pulse"

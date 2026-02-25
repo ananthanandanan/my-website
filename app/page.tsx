@@ -6,7 +6,7 @@ import { ProjectCard } from "@/app/components/ProjectCard";
 import { getAllPosts } from "@/lib/blog";
 import { projectsData } from "@/lib/projectsData";
 
-const WRAP = "mx-auto w-full max-w-[680px] px-6 sm:px-8";
+const WRAP = "mx-auto w-full max-w-[1150px] px-6 sm:px-8";
 const HOME_POSTS = 6;
 const HOME_PROJECTS = 4;
 

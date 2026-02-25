@@ -2,7 +2,7 @@ import { getAllPosts } from "@/lib/blog";
 import { getAllTagsFromPosts } from "@/lib/tags";
 import { PostsListClient } from "./PostsListClient";
 
-const WRAP = "mx-auto max-w-[680px] px-6 sm:px-8";
+const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 const POSTS_PER_PAGE = 10;
 
 export default function PostsPage() {

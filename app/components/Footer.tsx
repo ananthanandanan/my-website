@@ -33,10 +33,10 @@ function SocialIcon({ icon }: { icon: string }) {
   );
 }
 
-export function Footer({ wide = false }: { wide?: boolean }) {
+export function Footer({ wide: _wide = false }: { wide?: boolean }) {
   return (
     <footer className="w-full">
-      <div className={`mx-auto w-full ${wrapPadding} ${wide ? "max-w-[920px]" : "max-w-[680px]"} pb-12 pt-8`}>
+      <div className={`mx-auto w-full ${wrapPadding} max-w-[1150px] pb-12 pt-8`}>
         <div className="mb-5 flex items-center justify-between">
           <div className="font-(family-name:--font-libre-baskerville) italic text-[0.95rem] tracking-[0.01em] text-text-mid">
             {siteMetadata.author}

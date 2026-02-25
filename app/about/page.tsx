@@ -67,7 +67,7 @@ export default function AboutPage() {
     <div className={WRAP}>
       <header className="pt-16">
         <div
-          className="mb-3 flex items-center gap-3 text-[11px] uppercase tracking-[0.2em] text-accent"
+          className="type-eyebrow mb-3 flex items-center gap-3 text-accent"
           style={{ letterSpacing: "0.2em" }}
         >
           <span
@@ -79,10 +79,10 @@ export default function AboutPage() {
         <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.6vw,2.35rem)] leading-[1.2] font-bold text-warm">
           K N Anantha Nandanan
         </h1>
-        <p className="mt-2 text-[12.5px] uppercase tracking-[0.14em] text-text-dim">
+        <p className="type-meta mt-2 uppercase tracking-[0.14em] text-text-dim">
           Backend Engineer · Kerala, India
         </p>
-        <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 text-[11.5px] uppercase tracking-widest text-[#7bdc9f]">
+        <div className="type-meta mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 uppercase tracking-[0.12em] text-[#7bdc9f]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#2ecc71]" aria-hidden />
           Open to opportunities
         </div>
@@ -92,7 +92,7 @@ export default function AboutPage() {
         {/* Now Card */}
         <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="px-6 pt-6 pb-1">
-            <div className="mb-1.5 flex items-center gap-2 text-[10.5px] uppercase tracking-[0.18em] text-accent">
+            <div className="type-meta mb-1.5 flex items-center gap-2 uppercase tracking-[0.18em] text-accent">
               <span className="inline-block h-px w-4 bg-border" aria-hidden />
               Now
             </div>
@@ -103,10 +103,10 @@ export default function AboutPage() {
                 key={label}
                 className="grid grid-cols-[80px_1fr] gap-4 py-2 px-2 first:pt-2"
               >
-                <div className="text-[11px] uppercase tracking-[0.14em] text-text-dim">
+                <div className="type-meta uppercase tracking-[0.14em] text-text-dim">
                   {label}
                 </div>
-                <div className="text-[14px] leading-[1.75] text-text-mid">
+                <div className="type-body leading-[1.75] text-text-mid">
                   {value}
                 </div>
               </div>
@@ -116,32 +116,32 @@ export default function AboutPage() {
 
         {/* Bio Card */}
         <div className="rounded-xl border border-border bg-surface p-7">
-          <p className="mb-4 text-[14.5px] leading-[1.9] text-text-mid">
+          <p className="type-lead mb-4 measure-readable">
             I&apos;m K N Anantha Nandanan — a software engineer focused on
             scalable backend systems and applying AI to real problems. I&apos;ve
             spent the last few years working across Django, FastAPI, and
             LangChain — most recently on QuestCraft, an LLM-powered assessment
             platform for teachers.
           </p>
-          <p className="mb-4 text-[14.5px] leading-[1.9] text-text-mid">
+          <p className="type-lead mb-4 measure-readable">
             Before that, I worked on infrastructure, DevOps, and self-hosted
             tooling — the kind of work that keeps everything else running. I
             care about systems that are legible, observable, and honest about
             their failure modes.
           </p>
-          <p className="mb-6 text-[14.5px] leading-[1.9] text-text-mid">
+          <p className="type-lead mb-6 measure-readable">
             When I&apos;m not building, I write about what I&apos;m learning
             here. I believe in small, sharp tools, slow reading, and shipping
             things that actually work.
           </p>
 
-          <div className="mb-3 text-[10px] uppercase tracking-[0.18em] text-text-dim">
+          <div className="type-meta mb-3 uppercase tracking-[0.18em] text-text-dim">
             Stack
           </div>
           <div className="flex flex-col gap-3.5">
             {stackGroups.map((group) => (
               <div key={group.label} className="flex flex-col gap-2">
-                <div className="text-[9.5px] uppercase tracking-[0.18em] text-text-dim">
+                <div className="type-meta uppercase tracking-[0.18em] text-text-dim">
                   {group.label}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -166,7 +166,7 @@ export default function AboutPage() {
         {/* Beliefs Card */}
         <div className="overflow-hidden rounded-xl border border-border bg-surface">
           <div className="px-6 pt-6 pb-1">
-            <div className="mb-1.5 flex items-center gap-2 text-[10.5px] uppercase tracking-[0.18em] text-accent">
+            <div className="type-meta mb-1.5 flex items-center gap-2 uppercase tracking-[0.18em] text-accent">
               <span className="inline-block h-px w-4 bg-border" aria-hidden />
               Things I believe
             </div>
@@ -175,9 +175,9 @@ export default function AboutPage() {
             {beliefs.map((item, i) => (
               <div
                 key={item}
-                className="flex gap-3 py-2 px-2 text-[14px] leading-[1.8] first:pt-2"
+                className="type-body flex gap-3 py-2 px-2 leading-[1.8] first:pt-2"
               >
-                <span className="w-5 shrink-0 text-[11px] text-accent">
+                <span className="type-meta w-5 shrink-0 text-accent">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="text-text-mid">{item}</span>
@@ -197,7 +197,7 @@ export default function AboutPage() {
                   : "px-5 py-3.5"
               }
             >
-              <div className="mb-2 text-[10px] uppercase tracking-[0.18em] text-text-dim">
+              <div className="type-meta mb-2 uppercase tracking-[0.18em] text-text-dim">
                 {group.label}
               </div>
               <div className="flex flex-col gap-2">
@@ -209,7 +209,7 @@ export default function AboutPage() {
                     <span className="shrink-0 text-[13px] text-[#f5a623]">
                       {name}
                     </span>
-                    <span className="text-[13.5px] leading-[1.65] text-text-dim">
+                    <span className="type-body leading-[1.65] text-text-dim">
                       {desc}
                     </span>
                   </div>
@@ -224,7 +224,7 @@ export default function AboutPage() {
             <a
               key={s.name}
               href={s.href}
-              className="text-[12px] uppercase tracking-widest text-text-dim no-underline transition-colors hover:text-accent"
+              className="type-meta uppercase tracking-[0.14em] text-text-dim no-underline transition-colors hover:text-accent"
             >
               {s.name}
             </a>

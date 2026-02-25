@@ -25,10 +25,10 @@ export default async function TagPage({ params }: PageProps) {
   return (
     <div className={WRAP}>
       <header className="mb-10 pt-8">
-        <h1 className="font-(family-name:--font-libre-baskerville) text-2xl font-bold text-warm">
+        <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.3vw,2.5rem)] leading-[1.2] font-bold text-warm">
           Posts tagged “{tagInfo.tag}”
         </h1>
-        <p className="mt-2 text-[13px] text-text-mid">
+        <p className="type-lead mt-2">
           {filtered.length} post{filtered.length !== 1 ? "s" : ""}.
         </p>
       </header>

@@ -9,9 +9,9 @@
   --border: #1e2229;
   --border-soft: #181c22;
 
-  --text: #ede8e1;
-  --text-mid: #a8a29e;
-  --text-dim: #5a6070;
+  --text: #e4e4e7;
+  --text-mid: #c5c9d4;
+  --text-dim: #a4acbb;
   --warm: #f5f0ea;
 
   --accent: #4a9eff;
@@ -51,7 +51,7 @@
 html {
   box-sizing: border-box;
   scroll-behavior: smooth;
-  font-size: 15px;
+  font-size: 16px;
   width: 100%;
 }
 
@@ -66,10 +66,56 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-dm-mono), ui-monospace, monospace;
-  font-size: 14px;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+.measure-readable {
+  max-width: 68ch;
+}
+
+.type-eyebrow {
+  font-size: 0.8125rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.type-hero {
+  font-size: clamp(2.4rem, 4.4vw, 4rem);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+}
+
+.type-lead {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text-mid);
+}
+
+.type-title {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: var(--warm);
+}
+
+.type-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--text-mid);
+}
+
+.type-meta {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.type-chip {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
 }
 
 /* Optional noise/grain overlay */
@@ -90,8 +136,9 @@ body::before {
 
 /* ─── Post prose (single blog post) ──────────────────────── */
 .prose-post {
-  font-size: 15px;
-  line-height: 1.92;
+  max-width: 70ch;
+  font-size: 1.0625rem;
+  line-height: 1.85;
   color: var(--text-mid);
 }
 .prose-post h2 {

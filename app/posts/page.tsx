@@ -13,10 +13,10 @@ export default function PostsPage() {
   return (
     <div className={WRAP}>
       <header className="mb-10 pt-8">
-        <h1 className="font-(family-name:--font-libre-baskerville) text-2xl font-bold text-warm">
+        <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.3vw,2.5rem)] leading-[1.2] font-bold text-warm">
           All Posts
         </h1>
-        <p className="mt-2 text-[13px] text-text-mid">
+        <p className="type-lead measure-readable mt-2">
           Writing about things I learn and systems I build.
         </p>
       </header>

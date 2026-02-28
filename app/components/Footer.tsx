@@ -57,10 +57,10 @@ export function Footer({ wide: _wide = false }: { wide?: boolean }) {
         <div className="flex items-center justify-between border-t border-border pt-4">
           <div className="type-body flex items-center gap-2 tracking-[0.02em] text-text-mid">
             <Link
-              href="/blog/steal-this-post"
+              href="/license"
               className="text-accent no-underline border-b border-accent/25 transition-[border-color] hover:border-accent"
             >
-              Steal this post
+              Remix this post
             </Link>
             <span className="text-text-dim opacity-40">·</span>
             <a

@@ -7,6 +7,7 @@ import { extractTocFromSource } from "@/lib/toc";
 import { formatDate } from "@/lib/formatDate";
 import { PostLayout } from "../../components/PostLayout";
 import { siteMetadata } from "@/lib/siteMetadata";
+import { mdxComponents } from "@/app/components/mdx-components";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -38,7 +39,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const filePath = getPostFilePath(slug);
   const raw = fs.readFileSync(filePath, "utf-8");
   const toc = extractTocFromSource(raw);
-  const { content } = await compilePostMdx(raw);
+  const { content } = await compilePostMdx(raw, mdxComponents);
 
   return (
     <PostLayout

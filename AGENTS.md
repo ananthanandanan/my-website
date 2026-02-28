@@ -116,6 +116,7 @@ Guidance for coding agents working in this repository.
 ## MDX/content rules
 
 - Blog files are `.mdx` under `content/blog/`.
+- Authoring conventions for list formats/components are documented in `content/blog/WRITING_GUIDE.md`.
 - Frontmatter fields used by code include:
   - required in practice: `title`, `date`, `summary`
   - optional: `tags`, `draft`, `images`, `layout`, `canonicalUrl`, `authors`

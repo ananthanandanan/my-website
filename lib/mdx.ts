@@ -2,6 +2,13 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypePrettyCode, { type Options as RehypePrettyCodeOptions } from "rehype-pretty-code";
+
+const rehypePrettyCodeOptions: RehypePrettyCodeOptions = {
+  theme: "github-dark-dimmed",
+  keepBackground: false,
+  defaultLang: "bash",
+};
 
 const mdxOptions = {
   parseFrontmatter: true,
@@ -13,6 +20,7 @@ const mdxOptions = {
         rehypeAutolinkHeadings,
         { behavior: "wrap", properties: { className: ["anchor"] } },
       ],
+      [rehypePrettyCode, rehypePrettyCodeOptions],
     ],
   },
 };

@@ -218,6 +218,7 @@ body::before {
 
 .definition-list__badge {
   display: inline-block;
+  max-width: 100%;
   border-radius: 3px;
   border: 1px solid rgba(74, 158, 255, 0.2);
   background: #0c1929;
@@ -225,6 +226,8 @@ body::before {
   color: #4a9eff;
   font-size: 10.5px;
   line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .definition-list__row:hover .definition-list__badge {

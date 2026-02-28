@@ -6,8 +6,9 @@ const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 const nowItems = [
   ["Building", "QuestCraft — LLM-powered assessment platform for teachers"],
   ["Learning", "Distributed systems design, Rust for systems programming"],
-  ["Reading", "Designing Data-Intensive Applications — Kleppmann"],
-  ["Location", "Kollam, Kerala — IST (UTC+5:30)"],
+  ["Reading", "Shadow Slave"],
+  ["Location", "India — IST (UTC+5:30)"],
+  ["Hobby", "Reading novels and listening to music"],
 ];
 
 const stackGroups = [
@@ -39,25 +40,59 @@ const usesGroups = [
   {
     label: "Editor · Terminal",
     items: [
-      { name: "Neovim", desc: "Primary editor. Fast, composable, mine." },
-      { name: "VS Code", desc: "On the side for larger project navigation." },
+      { name: "Cursor", desc: "Primary coding environment." },
+      { name: "Warp", desc: "Terminal for daily development workflows." },
+      { name: "OpenCode", desc: "CLI coding assistant in my toolkit." },
     ],
   },
   {
     label: "OS · Hardware",
     items: [
       {
-        name: "Arch Linux",
-        desc: "Daily driver. I like knowing what's running.",
+        name: "macOS",
+        desc: "My daily driver across work and side projects.",
       },
     ],
   },
   {
-    label: "Services",
+    label: "Productivity",
     items: [
       {
-        name: "Plausible",
-        desc: "Analytics. Privacy-first, no cookie banners.",
+        name: "Notion",
+        desc: "Planning, notes, and project organization.",
+      },
+      {
+        name: "Aerospace",
+        desc: "Keyboard-first window management.",
+      },
+      {
+        name: "Shottr",
+        desc: "Fast screenshots and quick annotations.",
+      },
+      {
+        name: "Raycast",
+        desc: "Launcher and command center for everything.",
+      },
+    ],
+  },
+  {
+    label: "Devtools",
+    items: [
+      {
+        name: "Docker",
+        desc: "Containers for consistent local development.",
+      },
+      {
+        name: "Neovim",
+        desc: "NVIM for focused editing and code navigation.",
+      },
+      {
+        name: "tmux",
+        desc: "Terminal multiplexing for long-running workflows.",
+      },
+      {
+        name: "zoxide",
+        desc: "Smarter directory jumping in the terminal.",
       },
     ],
   },
@@ -86,7 +121,7 @@ export default function AboutPage() {
               K N Anantha Nandanan
             </h1>
             <p className="type-meta mt-2 uppercase tracking-[0.14em] text-text-dim">
-              Backend Engineer · Kerala, India
+              Backend Engineer · India
             </p>
             <div className="type-meta mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 uppercase tracking-[0.12em] text-[#7bdc9f]">
               <span
@@ -144,7 +179,8 @@ export default function AboutPage() {
           <p className="type-lead mb-6 measure-readable">
             When I&apos;m not building, I write about what I&apos;m learning
             here. I believe in small, sharp tools, slow reading, and shipping
-            things that actually work.
+            things that actually work. Outside of tech, I enjoy reading novels
+            and listening to music.
           </p>
 
           <div className="type-meta mb-3 uppercase tracking-[0.18em] text-text-dim">

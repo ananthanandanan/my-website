@@ -1,0 +1,190 @@
+---
+title: Setting Up Coolify with a Custom Domain and SSL Certificates Using Traefik and Cloudflare - A Comprehensive Guide
+date: '2024-11-17'
+tags: ['coolify', 'traefik', 'cloudflare', 'acme', 'self-host', 'devops']
+draft: false
+summary: Setting up a custom domain and SSL certificates for Coolify with Traefik and Cloudflare.
+images: []
+layout: PostLayout
+canonicalUrl: coolify-traefik
+authors: ['default']
+---
+
+# 🌐 Setting Up Coolify with a Custom Domain and SSL Certificates Using Traefik and Cloudflare: A Comprehensive Guide
+
+Coolify is a powerful self-hosted PaaS that simplifies application deployment, but setting up a custom domain with SSL certificates using Traefik can be tricky. After facing numerous challenges while configuring Coolify with Traefik as a reverse proxy and Cloudflare as the DNS provider, I've written this guide to save you time and frustration. Here, I'll walk you through the issues I encountered, the solutions I implemented, and the final working configuration. 🚀
+
+---
+
+## The Challenge: Custom Domain and SSL Setup with Traefik
+
+Coolify uses Traefik as its proxy to handle SSL certificates via Let's Encrypt. My goal was to:
+
+1. Configure a custom domain (`<your-domain>.tech`) with Cloudflare as the DNS provider.
+2. Enable wildcard SSL certificates for the domain and its subdomains (e.g., `*.your-domain.tech`).
+3. Automate SSL certificate issuance and renewal using Let's Encrypt.
+
+### Key Problems I Faced:
+
+1. **DNS Misconfiguration**:
+
+   - Let's Encrypt returned errors like:
+     ```
+     acme: error: 400 :: urn:ietf:params:acme:error:dns :: no valid A records found for <your-domain>.tech
+     ```
+     Despite adding DNS records in Cloudflare, they were not propagating as expected. ❌
+
+2. **Cloudflare API Token Permissions**:
+
+   - The Cloudflare API token initially lacked the correct permissions, causing Traefik to fail during the DNS-01 ACME challenge:
+     ```
+     acme: error presenting token: Cloudflare: failed to find zone <your-domain>.tech: Zone could not be found
+     ```
+
+3. **Conflicting HTTP and DNS Challenges**:
+
+   - Including both HTTP and DNS challenges in Traefik's configuration resulted in unexpected behavior, making certificate issuance fail repeatedly. ⚠️
+
+4. **Lack of Clear Documentation**:
+   - While Coolify provides helpful documentation, piecing together the right configuration for wildcard SSL certificates with Traefik and Cloudflare was a challenge. Well, I would say you have to be observant and understand the documentation well. The wildcard domain, for me at least did not work out of the box; with the default configuration, it would just not work.
+
+---
+
+## The Solution: A Step-by-Step Guide
+
+Here's the final process I followed to configure the custom domain and SSL certificates successfully. 💡
+
+### 1. **Set Up DNS Records in Cloudflare**
+
+Make sure your domain is managed in Cloudflare and that the DNS records are properly configured:
+
+- **A Records**:
+  - `<your-domain>.tech` → `<Server IP>`
+  - `*.your-domain.tech` → `<Server IP>`
+- **Proxy Status**: Set both records to **DNS Only** (gray cloud) to allow Traefik to handle SSL.
+
+### 2. **Generate a Cloudflare API Token**
+
+Create an API token in Cloudflare with the following permissions:
+
+- **Zone / DNS / Edit**: Allows Traefik to add DNS TXT records for the DNS-01 challenge.
+- **Zone / Zone / Read**: Allows Traefik to read DNS zones.
+
+**Steps**:
+
+1. Go to your Cloudflare dashboard.
+2. Navigate to **My Profile > API Tokens > Create Custom Token**.
+3. Set permissions as shown below:
+   - **Zone / DNS / Edit**
+   - **Zone / Zone / Read**
+4. Restrict the token to your domain (`<your-domain>.tech`) for added security. 🔒
+
+---
+
+### 3. **Configure Traefik**
+
+Here's the generic Traefik configuration that you can adapt for your own use:
+
+```yaml
+version: '3.8'
+networks:
+  coolify:
+    external: true
+services:
+  traefik:
+    container_name: coolify-proxy
+    image: 'traefik:v3.1'
+    restart: unless-stopped
+    environment:
+      - CF_DNS_API_TOKEN=<Your Cloudflare API Token> # Replace with your API token
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    networks:
+      - coolify
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+      - '8080:8080'
+    healthcheck:
+      test: 'wget -qO- http://localhost:80/ping || exit 1'
+      interval: 4s
+      timeout: 2s
+      retries: 5
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+      - '/data/coolify/proxy:/traefik'
+    command:
+      - '--ping=true'
+      - '--ping.entrypoint=http'
+      - '--api.dashboard=true'
+      - '--api.insecure=false'
+      - '--entrypoints.http.address=:80'
+      - '--entrypoints.https.address=:443'
+      - '--entrypoints.http.http.encodequerysemicolons=true'
+      - '--entryPoints.http.http2.maxConcurrentStreams=50'
+      - '--entrypoints.https.http.encodequerysemicolons=true'
+      - '--entryPoints.https.http2.maxConcurrentStreams=50'
+      - '--entrypoints.https.http3'
+      - '--providers.docker.exposedbydefault=false'
+      - '--providers.file.directory=/traefik/dynamic/'
+      - '--providers.file.watch=true'
+      - '--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare' # Use Cloudflare for DNS challenge
+      - '--certificatesresolvers.letsencrypt.acme.dnschallenge.delaybeforecheck=0'
+      - '--certificatesresolvers.letsencrypt.acme.storage=/traefik/acme.json'
+      - '--providers.docker=true'
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=http
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls.certresolver=letsencrypt
+      - traefik.http.routers.traefik.tls.domains[0].main=<your-domain>.tech # Replace with your main domain
+      - traefik.http.routers.traefik.tls.domains[0].sans=*.your-domain.tech # Replace with your wildcard domain
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.gzip.compress=true
+      - coolify.managed=true
+      - coolify.proxy=true
+```
+
+**Key Tips**:
+
+1. Use the **DNS-01 challenge** exclusively. **Do not** include the HTTP challenge (`httpchallenge`). 🚫
+2. Set `delaybeforecheck=0` to avoid unnecessary delays during DNS validation.
+
+---
+
+### 4. **Restart and Monitor**
+
+- Restart Traefik and monitor the logs to ensure successful certificate issuance.
+- In the Coolify Proxy logs, there won't be any output, this would mean that the certificate is issued successfully.
+
+---
+
+## Troubleshooting Common Issues
+
+1. **DNS Zone Not Found**:
+
+   - Ensure the API token has the correct permissions and is restricted to the specific domain.
+   - Verify that the nameservers for your domain point to Cloudflare.
+
+2. **No Valid A Records**:
+
+   - Double-check DNS records in Cloudflare and verify their propagation using [DNS Checker](https://dnschecker.org/).
+
+3. **Invalid API Token**:
+   - Regenerate the token with proper permissions and update the `CF_DNS_API_TOKEN` in your configuration.
+
+---
+
+## Resources
+
+- [Coolify Wildcard Certificate Docs](https://coolify.io/docs/knowledge-base/traefik/wildcard-certificates)
+- [Traefik GitHub Issue on Cloudflare DNS](https://github.com/traefik/traefik/issues/5965)
+- [Cloudflare API Token Documentation](https://developers.cloudflare.com/api/tokens/create/)
+
+---
+
+## Conclusion
+
+Setting up a custom domain and SSL certificates for Coolify with Traefik and Cloudflare requires careful attention to DNS configuration and API token permissions. By following this guide, you can avoid common pitfalls and ensure a smooth setup for your applications. 🎉

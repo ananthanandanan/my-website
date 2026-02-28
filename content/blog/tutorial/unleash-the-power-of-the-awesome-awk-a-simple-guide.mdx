@@ -1,0 +1,324 @@
+---
+title: Unleash the Power of the Awesome AWK ~ A Simple Guide
+date: '2024-06-04'
+tags: ['tutorial', 'CLI', 'text-processing']
+draft: false
+summary: Learn the basics of AWK, a powerful text processing tool used for data manipulation, string processing, and pattern scanning. Discover how to filter and transform data using simple and intuitive code examples.
+images: []
+layout: PostLayout
+canonicalUrl: awk-tutorial
+authors: ['default']
+---
+
+# Overview
+
+Ever found yourself lost in a sea of text data, struggling to extract the information you need? especially in the command line or shell scripts? Well fear not, for AWK is here to save your day! In this tutorial we will emabak on a journy to master the AWK, a powerful and versatil text processing tool that will make you data analysis tasks a breeze. It could even work well for your menial tasks like extracting data from logs, CSV files, and more.🚀
+
+# What is AWK?🐘
+
+AWK is a powerful and flexible text processing tool used for data manipulation, string processing, and pattern scanning. It was created by Alfred Aho, Peter Weinberger, and Brian Kernighan back in the 1970s. This venerable tool is still widely used today, thanks to its incredible flexibility and ease of use. 💫
+
+## Installation 🛠️
+
+AWK is pre-installed on most Unix-like systems, including Linux and macOS. To check if AWK is installed on your system, you can run the following command:
+
+```bash
+awk --version
+```
+
+If AWK is not installed on your system, you can install it using the package manager of your operating system. For example, on Ubuntu, you can install AWK using the following command:
+
+```bash
+sudo apt-get install awk
+```
+
+Now, if you are on a Mac, you can install AWK using Homebrew:
+
+```bash
+brew install awk
+```
+
+## Basic AWK Syntax 🔨
+
+When it comes to the AWK syntax, it has a very simple and straightforward structure. It mainly consist of:
+
+- **Patterns**: These are conditions that determine when a particular action should be executed.
+
+- **Actions**: These are commands that are executed when a pattern is matched.
+
+- **Input**: This is the data that AWK processes. By default, AWK reads data line by line from standard input or files.
+
+Here's a basic syntax of an AWK command:
+
+```bash
+awk 'pattern { action }' input_file
+```
+
+## AWK Examples 🚀
+
+Now that we have covered the basics, let's dive into some practical examples to see AWK in action.
+
+### Example 1: Print Hello World
+
+Let's start with a simple example that prints "Hello, World!" using AWK:
+
+```bash
+echo "World Hello World" | awk '{ print "Hello, " $1 "!" }'
+```
+
+_Output_:
+
+```
+Hello, World!
+```
+
+In this example, we are using the `print` statement to output the text "Hello, " followed by the first field (`$1`) in the input data, followed by an exclamation mark.
+
+### Example 2: Filtering Data📊
+
+One of the most common uses of AWK is filtering data. For example, let's say we have a file containing a list of students and their grades. We want to find the students with grades higher than 80.
+
+```bash
+cat students.txt
+```
+
+_Output_:
+
+```
+Alice 90
+John 85
+Emma 78
+Peter 92
+Sara 81
+Mike 75
+```
+
+To filter the students with grades higher than 80, we can use the following AWK command:
+
+```bash
+awk '{if ($2 > 80) print $1}' students.txt
+```
+
+_Output_:
+
+```
+Alice
+John
+Peter
+Sara
+```
+
+In this example, we are using an `if` statement to check if the second field (`$2`) is greater than 80. If the condition is true, we print the first field (`$1`), which contains the student's name.
+
+### Example 3: Calculating Averages📈
+
+Another common use case for AWK is calculating averages. Let's say we have a file containing a list of numbers, and we want to calculate the average of these numbers.
+
+```bash
+cat numbers.txt
+```
+
+_Output_:
+
+```
+10
+20
+30
+40
+50
+```
+
+To calculate the average of these numbers, we can use the following AWK command:
+
+```bash
+awk '{ total += $1 } END { print "Average:", total/NR }' numbers.txt
+```
+
+_Output_:
+
+```
+Average: 30
+```
+
+Now, that's a bit different the examples we have seen so far. Let's break it down:
+
+- `total += $1`: This statement adds the value of the first field (`$1`) to the `total` variable.
+- `END`: This is a special pattern that is executed after all the input has been processed.
+- `print "Average:", total/NR`: This statement calculates the average by dividing the total by the number of records (`NR`) and prints the result.
+
+> **Note**: In AWK, like `END`, there is also a `BEGIN` pattern that is executed before any input is processed. You can use it to initialize variables or perform any other setup tasks.
+
+Just like `NR`, AWK provides a number of built-in variables that you can use in your scripts. Here are some of the most commonly used ones:
+
+- `NF`: The number of fields in the current record.
+- `NR`: The total number of records processed so far.
+- `FS`: The field separator (default is whitespace).
+- `OFS`: The output field separator (default is whitespace).
+- `RS`: The record separator (default is a newline).
+- `ORS`: The output record separator (default is a newline).
+
+Let's look at some more examples to see how these variables can be used in practice.
+
+### Example 4: NF and NR Variables🔢
+
+In this example, we will print the number of fields in each record and the total number of records in a file.
+
+```bash
+cat data.txt
+```
+
+_Output_:
+
+```
+Alice 90
+John 85
+Emma 78
+Peter 92
+Sara 81
+Mike 75
+```
+
+To print the number of fields in each record and the total number of records, we can use the following AWK command:
+
+```bash
+awk '{ print "Fields:", NF, "Records:", NR }' data.txt
+```
+
+_Output_:
+
+```
+Fields: 2 Records: 1
+Fields: 2 Records: 2
+Fields: 2 Records: 3
+Fields: 2 Records: 4
+Fields: 2 Records: 5
+Fields: 2 Records: 6
+```
+
+In this example, we are using the `NF` and `NR` variables to print the number of fields and records in each line of the input file. Thus what `NR` does is that it counts the number of records processed so far, while `NF` counts the number of fields in the current record.
+
+### Example 5: Changing the Record Separator🔀
+
+The `RS` variable sets the input record separator. By default, the input record separator is a newline. You can change it to any character you like.
+
+Imagine you have a book (input data) with chapters (records) and sentences (fields) in each chapter. AWK helps you process this book in a structured way:
+
+    - Think of RS as the marker that separates chapters in the book.
+    - By default, RS is a newline (\n), so AWK treats each line as a separate chapter (record).
+    - You can change RS to any character or string to define what separates your records.
+
+Let the input data.txt be:
+
+```bash
+Chapter 1: Alice scored 90.|Chapter 2: John scored 85.|Chapter 3: Emma scored 78.
+```
+
+To print each chapter separately, we can use the following AWK command:
+
+```bash
+awk 'BEGIN { RS="|" } { print "Record:", NR, "\nContent:", $0, "\n" }' data.txt
+```
+
+_Output_:
+
+```
+Record: 1
+Content: Chapter 1: Alice scored 90.
+
+Record: 2
+Content: Chapter 2: John scored 85.
+
+Record: 3
+Content: Chapter 3: Emma scored 78.
+```
+
+Here, RS is set to `|`, so AWK treats the text between `|` as separate records (chapters). NR is the record number, and $0 is the entire record content.
+
+### Example 6: Changing the Field Separator🔀
+
+The `FS` variable sets the input field separator. By default, the input field separator is whitespace. You can change it to any character you like. Once AWK identifies a record (chapter), it uses FS to split it into fields (sentences).
+
+```bash
+cat data.csv
+```
+
+_Output_:
+
+```
+Name:Alice,Grade:90|Name:John,Grade:85|Name:Emma,Grade:78
+```
+
+To print the name and grade of each student, we can use the following AWK command:
+
+```bash
+ awk 'BEGIN { RS="|"; FS="[,:] *" } { print "Name:", $2, "\nGrade:", $4, "\n" }' data.csv
+```
+
+_Output_:
+
+```
+Name: Alice
+Grade: 90
+
+Name: John
+Grade: 85
+
+Name: Emma
+Grade: 78
+```
+
+Here, RS is set to `|`, so AWK treats the text between `|` as separate records. FS is set to `[,:] *`, so AWK treats `:` and `,` as field separators. `$2` and `$4` are the name and grade fields, respectively. For example, `$0` is the entire record content, `$1` is the first field, `$2` is the second field, and so on.
+
+### Example 6: Output Field Separator🔗
+
+`OFS`, what it does basically does is that it sets the output field separator. By default, the output field separator is a space. You can change it to any character you like.
+
+Let's assume the input data is:
+
+```bash
+cat data.txt
+```
+
+_Output_:
+
+```
+Name:Alice,Grade:90|Name:John,Grade:85|Name:Emma,Grade:78
+```
+
+To print the name and grade of each student separated by an `->`, we can use the following AWK command:
+
+```bash
+awk 'BEGIN { RS="|"; FS="[,:] *"; OFS=" -> " } { print $2, $4 }' data.csv
+```
+
+_Output_:
+
+```
+Alice -> 90
+John -> 85
+Emma -> 78
+```
+
+In this example, we are using the `OFS` variable to set the output field separator to `->`. This means that the name and grade fields will be separated by `->` in the output.
+
+### Example 7: Changing the Output Record Separator🔗
+
+For `ORS`, it sets the output record separator. By default, the output record separator is a newline. You can change it to any character you like. So in simple terms, this setting tells AWK to print a specific character or string after each record.
+
+```bash
+echo "Name:Alice,Grade:90|Name:John,Grade:85|Name:Emma,Grade:78" | awk 'BEGIN { RS="|"; FS="[,:] *"; OFS=" -> "; ORS="\n---\n" } { print $2, $4 }'
+```
+
+_Output_:
+
+```
+Alice -> 90
+---
+John -> 85
+---
+Emma -> 78
+```
+
+# Conclusion
+
+In this tutorial, we have covered the basics of AWK and seen how it can be used for data manipulation, string processing, and pattern scanning. We have explored some practical examples to demonstrate the power and flexibility of AWK. With its simple and intuitive syntax. For me personally, AWK has been a lifesaver when it comes to processing text data in the command line. I hope you find it as useful as I do. Happy coding! 🚀

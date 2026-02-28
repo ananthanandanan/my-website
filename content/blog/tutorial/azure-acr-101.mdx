@@ -1,0 +1,81 @@
+---
+title: Azure ACR 101
+date: '2023-12-01'
+tags: ['cloud', 'devOps', 'azure-cli']
+draft: false
+summary: This is a blog guiding through how to build, push and pull azure acr images.
+images: []
+layout: PostLayout
+canonicalUrl: azure-acr-101
+authors: ['default']
+---
+
+# Azure ACR 101
+
+Azure Container Registry (ACR) is a managed Docker registry service provided by Azure for storing and managing your private Docker container images and other artifacts. It's based on the open-source Docker Registry 2.0.
+
+In this blog, we will guide you through the process of building, pushing, and pulling an image using Azure ACR.
+
+## Prerequisites
+
+- An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/en-us/free/).
+- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) installed on your machine.
+- [Docker](https://docs.docker.com/get-docker/) installed on your machine.
+
+## Login to Azure
+
+First, you need to login to your Azure account and set your subscription.
+
+```bash
+az login
+az account set --subscription "your-subscription-id"
+```
+
+## Create a resource group and a registry
+
+Create a resource group and a registry.
+
+```bash
+az group create --name myResourceGroup --location eastus
+az acr create --resource-group myResourceGroup --name myRegistry --sku Basic
+```
+
+## Build image
+
+Now, you can build an image and push it to the registry.
+
+```bash
+az acr build --image sample/hello-world:v1 --registry myRegistry --file Dockerfile .
+```
+
+> NOTE: You can also use the `docker build -t` command to build and tag the image.
+
+```bash
+docker build -t myRegistry.azurecr.io/sample/hello-world:v1 .
+```
+
+## Push image
+
+Push the image to the registry.
+
+```bash
+az acr push --image sample/hello-world:v1 --registry myRegistry
+```
+
+or you can use the `docker push` command to push the image.
+
+```bash
+docker push myRegistry.azurecr.io/sample/hello-world:v1
+```
+
+## Pull image from registry
+
+Finally, you can pull the image from the registry to use it.
+
+```bash
+docker pull myRegistry.azurecr.io/sample/hello-world:v1
+```
+
+## Conclusion
+
+That's it! You have successfully built, pushed, and pulled an image using Azure ACR. We hope this guide helps you understand the process better and encourages you to explore more with Azure ACR.

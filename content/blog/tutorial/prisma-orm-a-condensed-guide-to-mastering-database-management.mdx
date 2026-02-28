@@ -1,0 +1,809 @@
+---
+title: Prisma ORM - A Condensed Guide to Mastering Database Management
+date: '2023-11-11'
+tags: ['orm', 'tutorial']
+draft: false
+summary: Dive into the heart of Prisma ORM with this condensed guide, covering all the essentials for mastering efficient database management.
+images: []
+layout: PostLayout
+canonicalUrl: prisma-tut
+authors: ['default']
+---
+
+In the previous blog, I had discussed about TRPC, a new RPC framework for TypeScript. In this blog, I will be walking through the basics of Prisma ORM,
+everything you need to know to get started with it and use it in your projects.
+
+# What is Prisma?
+
+Prisma is a modern database toolkit that makes database access easy with an auto-generated and type-safe query builder for Node.js and TypeScript. It is a
+database toolkit that consists of three main components:
+
+- Prisma Client: Auto-generated and type-safe query builder for Node.js and TypeScript
+- Prisma Migrate: Declarative data modeling and migrations
+- Prisma Studio: GUI to view and edit data in your database
+
+## Getting Started
+
+### PlanetScale
+
+Prisma supports a wide range of databases, but for this tutorial, we will be using PlanetScale, a MySQL compatible database. PlanetScale is a cloud
+database platform that provides a fully managed MySQL compatible database service.
+
+To get started, you can sign up for a free account at [PlanetScale](https://planetscale.com/). Once you have signed up, you can create a new database
+cluster. You can name the cluster anything you want, and choose the region closest to you.
+
+### Dependencies
+
+- Create a project directory and initialize a new npm project.
+
+```bash
+mkdir prisma-tut
+cd prisma-tut
+npm init -y
+```
+
+- Install the Prisma CLI as a dev dependency. And other necessary dependencies.
+
+```bash
+npm i --save-dev prisma typescript ts-node @types/node nodemon
+```
+
+### initialize Prisma
+
+- Initialize Prisma in your project directory.
+
+```bash
+npx prisma init --datasource-provider mysql
+```
+
+> As you can see, I provided the datasource as `mysql`. Since in planetscale I configured a MySQL database.
+
+> Note: For good intellesense support for prisma in vscode, use the prisma extension.
+
+After that paste the Database URL from PlanetScale to the `.env` file.
+
+## Prisma Schema
+
+Prisma Schema is a declarative language that allows you to define your application models and their relations. It is used to define the data model of your
+application.
+
+- So let's start by creating a simple "User" model in the `schema.prisma` file.
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+```
+
+- Now, we need the database to reflect the changes we made in the schema. So, we need to migrate the database.
+
+```bash
+npx prisma migrate dev --name init
+```
+
+> Note: Funny thing is for PlanetScale, you can't use the migrate command. Because PlanetScale has certain system
+> setup for migration file tracking in their workflow.
+
+So instead use the below command:
+
+```bash
+npx prisma db push
+```
+
+- Now to be able to use the schema in our code, we need to install the Prisma Client.
+
+```bash
+npm i @prisma/client
+```
+
+- Now, we can use the Prisma Client to interact with the database.
+
+To regenerate the Prisma Client, run the following command:
+
+```bash
+npx prisma generate
+```
+
+## CRUD Operations
+
+### Create
+
+- Let's create a new user in the database.
+
+```ts
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+async function main() {
+  const user = await prisma.user.create({
+    data: {
+      name: 'John Doe',
+    },
+  })
+
+  console.log(users)
+}
+
+main()
+  .catch((e) => {
+    console.error(e.message)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
+```
+
+This will create a new user in the database with the name "John Doe".
+
+### Read
+
+- Let's say we want to get all the users from the database.
+
+```ts
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+
+async function main() {
+  const users = await prisma.user.findMany()
+
+  console.log(users)
+}
+```
+
+This will return all the users from the database.
+
+## Model Fields
+
+### Field Attributes
+
+There are a lot of different types of field attributes that you can use in your models. They are:
+
+- **@id**: This field is used to define the primary key of the model.
+- **@default**: This field is used to define the default value of the field.
+- **@unique**: This field is used to define the field as unique.
+- **@map**: This field is used to define the name of the field in the database.
+- **@relation**: This field is used to define the relation between two models.
+- **@ignore**: This field is used to ignore the field in the database.
+- **@updatedAt**: This field is used to define the field as updated at.
+- **@uuid**: This field is used to define the field as uuid.
+- **@@index**: This field is used to define the index of the field in the database. This is a block-level attribute.
+- **@@unique**: This field is used to define the field as unique in the database. This is a block-level attribute.
+
+### Field Type
+
+There are a lot of different types of field types that you can use in your models. They are:
+
+- `String`: This field is used to define a string field.
+- `Int`: This field is used to define an integer field.
+- `Float`: This field is used to define a float field.
+- `Boolean`: This field is used to define a boolean field.
+- `DateTime`: This field is used to define a date time field.
+- `Json`: This field is used to define a json field.
+- `Bytes`: This field is used to define a bytes field.
+- `Decimal`: This field is used to define a decimal field.
+- `BigInt`: This field is used to define a big integer field.
+- `Enum`: This field is used to define an enum field.
+- `Unsupported`: This field is used to define an unsupported field.
+
+There are also different varients for each of these types based on the database you are using. You can check them out in the [Prisma Docs](https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#model-fields).
+
+## Relations
+
+### One-to-Many
+
+- Let's say we want to create a new model called "Post" which has a one-to-many relation with the "User" model.
+
+```prisma
+model User {
+  id            String  @id @default(uuid())
+  name          String
+  email         String
+  isAdmin       Boolean
+  preferences   Json
+  writtenPosts  Post[]  @relation("writtenPosts")
+  favoritePosts Post[]  @relation("favoritePosts")
+}
+
+model Post {
+  id            String   @id @default(uuid())
+  rating        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime
+  author        User     @relation("writtenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId      String
+  favoritedBy   User?     @relation("favoritePosts", fields: [favoritedById], references: [id], onDelete: Cascade)
+  favoritedById String?
+
+  @@index([authorId], name: "authorId")
+  @@index([favoritedById], name: "favoritedById")
+}
+```
+
+- Okay, so a lot of things are going on here. Let's break it down.
+
+- First, we have defined a new model called "Post". It has a one-to-many relation with the "User" model. So, we have defined two fields in the "Post"
+  model, "author" and "favoritedBy". Both of these fields have a relation with the "User" model. The "author" field has a relation with the "User" model
+  with the name "writtenPosts", and the "favoritedBy" field has a relation with the "User" model with the name "favoritePosts".
+
+> Note: Since we are using two relations with the same model, we need to provide a name for each of the relations. That is why we have provided the
+> `writtenPosts` and `favoritePosts` names for the relations to avoid ambiguity.
+
+- So if you want to create a one-to-many relation from `User` to `Post`, the format you want to follow is:
+
+```prisma
+author        User     @relation("writtenPosts", fields: [authorId], references: [id], onDelete: Cascade)
+authorId      String
+```
+
+- And since we are using `relationMode = "prisma"` in the `datasource` block, we need to provide index for the fields that are used in the relation.
+
+```prisma
+@@index([authorId], name: "authorId")
+```
+
+- The `?` in the `favoritedBy` field means that the field is optional. And `[]` in the `writtenPosts` field means that the field is an array.
+
+- `onDelete: Cascade` means that if the user is deleted, all the posts written by the user will also be deleted.
+
+### Many-to-Many
+
+- Let's say we want to create a new model called "Category" which has a many-to-many relation with the "Post" model.
+
+```prisma
+model Category {
+  id    String @id @default(uuid())
+  name  String
+  posts Post[]
+}
+
+model Post {
+  id            String     @id @default(uuid())
+  ....
+  ....
+  categories    Category[]
+}
+```
+
+- Constructing a many-to-many relation is pretty simple. You just need to add the model name in the field type. And Prisma will automatically create a
+  many-to-many relation between the two models. That is by creating a join table between the two models.
+
+### One-to-One
+
+- Let's say we want to create a new model called "userPreference" which has a one-to-one relation with the "User" model.
+
+```prisma
+model User {
+  id             String          @id @default(uuid())
+  name           String
+  email          String
+  isAdmin        Boolean
+  writtenPosts   Post[]          @relation("writtenPosts")
+  favoritePosts  Post[]          @relation("favoritePosts")
+  userPreference UserPreference? // one-to-one relation
+}
+
+model UserPreference {
+  id           String  @id @default(uuid())
+  emailUpdates Boolean
+  user         User    @relation(fields: [userId], references: [id]) // one-to-one relation
+  userId       String  @unique // one-to-one relation
+}
+```
+
+- To create a one-to-one relation, you just need to provide the relation in `User` model and `UserPreference` model. Such that
+  in `User` unlike in one-to-many relation, you don't need to provide the field as an array. And in `UserPreference` model, you need to provide the
+  `userId` field as `unique`.
+
+## Enum
+
+Enum is a special type of datasource generator that allows you to define a set of named constants. Like let's say we know
+that the user can have only two roles, "ADMIN" and "USER". So, we can define an enum for the roles.
+
+```prisma
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+  role Role  @default(USER)
+}
+```
+
+## Create Operations
+
+To create a new record in the database, you can use the `create` method.
+
+```ts
+const user = await prisma.user.create({
+  data: {
+    name: 'Ananthan',
+    email: 'ananthan@gmail.com',
+    age: 20,
+    isAdmin: true,
+  },
+})
+
+console.log(user)
+```
+
+- With prisma, you can also use the relations even though those models are not created yet. Prisma will automatically create the relations for you.
+
+```ts
+const user = await prisma.user.create({
+  data: {
+    name: 'Ananthan',
+    email: 'ananthan@gmail.com',
+    age: 20,
+    isAdmin: true,
+    userPreference: {
+      // one-to-one relation
+      create: {
+        emailUpdates: true,
+      },
+    },
+  },
+})
+```
+
+### Inlcude
+
+- If you want to view returned relations, you need to use the `include` method.
+
+```ts
+const user = await prisma.user.create({
+  data: {
+    name: 'Ananthan',
+    email: 'ananthan@gmail.com',
+    age: 20,
+    isAdmin: true,
+    userPreference: {
+      create: {
+        emailUpdates: true,
+      },
+    },
+  },
+  include: {
+    userPreference: true,
+  },
+})
+```
+
+The output would look something like this:
+
+```json
+{
+  "id": "ce9f1204-04df-4094-b055-a7d308ce4fee",
+  "name": "Ananthan",
+  "age": 20,
+  "email": "ananthan@gmail.com",
+  "role": "BASIC",
+  "isAdmin": true,
+  "userPreference": {
+    "id": "8b8c1bea-99e8-4937-8278-8f4e65e9c24b",
+    "emailUpdates": true,
+    "userId": "ce9f1204-04df-4094-b055-a7d308ce4fee"
+  }
+}
+```
+
+### Select
+
+- If you want to view only specific fields, you need to use the `select` method.
+
+```ts
+const user = await prisma.user.create({
+  data: {
+    name: 'Ananthan',
+    email: 'ananthan@gmail.com',
+    age: 20,
+    isAdmin: true,
+    userPreference: {
+      create: {
+        emailUpdates: true,
+      },
+    },
+  },
+  select: {
+    name: true,
+    userPreference: true,
+  },
+})
+
+console.log(user)
+```
+
+The output would look something like this:
+
+```json
+{
+  "name": "Ananthan",
+  "userPreference": {
+    "id": "8b8c1bea-99e8-4937-8278-8f4e65e9c24b",
+    "emailUpdates": true,
+    "userId": "ce9f1204-04df-4094-b055-a7d308ce4fee"
+  }
+}
+```
+
+> NOTE: You can only use either `include` or `select` method. You can't use both at the same time.
+
+### CreateMany
+
+- Let's suppose in our application, we want to create multiple users at once. We can use the `createMany` method.
+
+```ts
+const user = await prisma.user.createMany({
+  data: [
+    {
+      name: 'Ananthan',
+      email: 'ananthan@gmail.com',
+      age: 20,
+      isAdmin: true,
+    },
+    {
+      name: 'Raj',
+      email: 'rajive@gmail.com',
+      age: 20,
+      isAdmin: false,
+    },
+  ],
+})
+console.log(user)
+```
+
+## Read Operations
+
+### FindUnique
+
+- To find that one specific record in the database, you can use the `findUnique` method.
+
+```ts
+const user = await prisma.user.findUnique({
+  where: {
+    id: 'ce9f1204-04df-4094-b055-a7d308ce4fee',
+  },
+})
+```
+
+> NOTE: If there is no matching record, it will return `null`.
+
+- Now for our `User` mode, we defined the unique fields as a pair of `age` and `name`. So, we can use that to find the record.
+
+```ts
+const user = await prisma.user.findUnique({
+  where: {
+    age_name: {
+      age: 20,
+      name: 'Ananthan',
+    },
+  },
+})
+```
+
+### FindFirst
+
+- We use this method to find the first matching record in the database.
+
+```ts
+const user = await prisma.user.findFirst({
+  where: {
+    name: 'Ananthan',
+  },
+})
+```
+
+### FindMany
+
+- We use this method to find all the matching records in the database.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: 'Ananthan',
+  },
+})
+```
+
+- You can also use the `distinct` method along with findMany to get the distinct records.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: 'Ananthan',
+  },
+  distinct: ['name', 'age'],
+})
+console.log(user)
+```
+
+- What this will do is, it will return only the distinct records with the name and age fields.
+
+### Pagination
+
+- You can also use pagination with the `findMany` method.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: 'Ananthan',
+  },
+  skip: 1,
+  take: 2,
+})
+console.log(user)
+```
+
+### orderBy
+
+We can also do sorting with the `findMany` method.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: 'Ananthan',
+  },
+  orderBy: {
+    age: 'asc',
+  },
+})
+```
+
+## Advanced Queries
+
+### IN Query
+
+- Let's say we want to find all the users with the name "Ananthan" or "Raj". We can use the `in` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: {
+      in: ['Ananthan', 'Raj'],
+    },
+  },
+})
+```
+
+- To get the users not in the list, we can use the `notIn` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    name: {
+      notIn: ['Ananthan', 'Raj'],
+    },
+  },
+})
+```
+
+### Comparison Queries
+
+- Similarly, we can also use `lt`, `lte`, `gt`, `gte` queries. Assuming here we are using the `age` field.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    age: {
+      lt: 20,
+    },
+  },
+})
+```
+
+### String Query
+
+- Let's say we want to find all users that have the pattern of `@gmail.com` in their email. We can use the `contains` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    email: {
+      contains: '@gmail.com',
+    },
+  },
+})
+```
+
+- Similarly, we can also use `startsWith` and `endsWith` queries.
+
+## Logical Queries
+
+### AND Query
+
+- Let's say we want to find all users with the name "Ananthan" and age less than 20. We can use the `AND` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    AND: [
+      {
+        name: 'Ananthan',
+      },
+      {
+        age: {
+          lt: 20,
+        },
+      },
+    ],
+  },
+})
+```
+
+### OR Query
+
+- Let's say we want to find all users with the name "Ananthan" or age less than 20. We can use the `OR` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    OR: [
+      {
+        name: 'Ananthan',
+      },
+      {
+        age: {
+          lt: 20,
+        },
+      },
+    ],
+  },
+})
+```
+
+### NOT Query
+
+- Let's say we want to find all users with the name "Ananthan" and age not less than 20. We can use the `NOT` query.
+
+```ts
+const user = await prisma.user.findMany({
+  where: {
+    NOT: [
+      {
+        name: 'Ananthan',
+      },
+      {
+        age: {
+          lt: 20,
+        },
+      },
+    ],
+  },
+})
+```
+
+## Relationship Queries
+
+- Let's say we want to query on our `User` model for the relation `writtenPosts`. In this case for example:
+
+```ts
+const user = await prisma.post.findMany({
+  where: {
+    writtenPosts: {
+      every: {
+        title: 'My First Post',
+      },
+    },
+  },
+})
+```
+
+- This will return all the users who have written a post with the title "My First Post".
+
+- Similarly, we can also use `some` and `none` queries.
+
+## Update Operations
+
+- To update a record in the database, you can use the `update` method.
+
+```ts
+const user = await prisma.user.update({
+  where: {
+    email: 'ananthan@gmail.com',
+  },
+  data: {
+    email: 'henix@gmail.com',
+  },
+})
+console.log(user)
+```
+
+Here, we are updating the email of the user with the email `ananthan@gmail.com` to `henix@gmail.com`. And the `update` method will return the updated
+record.
+
+- You can also chain the different query methods I have mentioned above to update the required record. So go fancy with it. 😎
+
+- Some special methods in update are:
+
+* `increment`: This method is used to increment the value of a field by a certain amount.
+
+* `decrement`: This method is used to decrement the value of a field by a certain amount.
+
+* `multiply`: This method is used to multiply the value of a field by a certain amount.
+
+* `divide`: This method is used to divide the value of a field by a certain amount.
+
+### Connect
+
+- Let's assume that we already have a `Post` record in the database. And we want to connect that record to the user. We can use the `connect`
+  method.
+
+```ts
+const post = await prisma.post.create({
+  data: {
+    title: 'Prisma makes databases easy',
+    averageRating: 4.0,
+    author: {
+      connectOrCreate: {
+        where: {
+          email: 'ronjacob@gmail.com',
+        },
+        create: {
+          email: 'ronjacob@gmail.com',
+          name: 'Ron Jacob',
+          age: 22,
+          isAdmin: true,
+        },
+      },
+    },
+  },
+  include: {
+    author: true,
+  },
+})
+```
+
+- Here, we are connecting the `Post` record to the user with the email `ronjacob@gmail.com` if the user exists. If the user doesn't exist, we are
+  creating a new user with the email `ronjacob@gmail.com` and connecting the `Post` record to the newly created user.
+
+> NOTE: You can also use the `disconnect` method to disconnect the record during update.
+
+## Delete Operations
+
+### Delete
+
+- To delete a record in the database, you can use the `delete` method.
+
+```ts
+const user = await prisma.user.delete({
+  where: {
+    email: 'ananthan@gmail.com',
+  },
+})
+```
+
+In this example, we are deleting the user with the email `ananthan@gmail.com`.
+
+### DeleteMany
+
+- To delete multiple records in the database, you can use the `deleteMany` method.
+
+```ts
+const user = await prisma.user.deleteMany({
+  where: {
+    age: {
+      lt: 20,
+    },
+  },
+})
+```
+
+- Here we are deleting all the users with the age less than 20.
+
+## Conclusion
+
+So, that's it for this blog. I have covered all the basics of Prisma ORM after learning it for a week. I believe this blog will help you get started with
+Prisma ORM and use it in your projects. If you want to learn more about Prisma ORM, you can check out the [Prisma Docs](https://www.prisma.io/docs/).

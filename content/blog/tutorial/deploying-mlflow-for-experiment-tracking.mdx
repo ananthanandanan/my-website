@@ -1,0 +1,187 @@
+---
+title: Deploying MLflow for experiment tracking
+date: '2024-02-04'
+tags: ['MLOps', 'experiment-tracking', 'MLflow', 'docker', 'azure']
+draft: false
+summary: This blog will be about how to dockerize and deploy MLflow for tracking
+images: []
+layout: PostLayout
+canonicalUrl: mlflow
+authors: ['default']
+---
+
+# Deploying MLflow for experiment tracking
+
+MLflow is an open source platform for the complete machine learning lifecycle. It is designed to work with any machine learning library and can be used to track experiments, package code into reproducible runs, and share and deploy models. It is a great tool for tracking experiments and managing machine learning models. In this blog, we will see how to deploy MLflow for experiment tracking.
+
+## A brief story of how I started using MLflow
+
+I started using MLflow at my current job as a MLOps engineer. We were working on a project to use LLMs for a specific task. We started using [Promptfoo](https://promptfoo.dev/), which is a great tool for fine-tuning LLMs. We were using different models and evaluating the prompts on different datasets. But promptfoo was not a full fledged experiment tracking tool. So we decided to use MLflow for logging the different metrics and parameters. We also used MLflow for logging the models and the artifacts. It was a great experience using MLflow and it helped us a lot in tracking the experiments.
+
+Based on my experience, Promptfoo+MLflow is a great combination for fine-tuning LLMs and tracking the experiments. I will write a blog on how to use Promptfoo and MLflow together in the future.
+
+## The Headache of deploying MLflow
+
+Now, MLflow is a great tool, and I love anything Open Source. But deploying MLflow was a headache. We were using Azure DevOps for CI/CD and Azure Web App Container for deploying the MLflow server. But non of the documentation was clear on very specific aspect, which was the artifact store path. We were using Azure Blob Storage for storing the artifacts. But the documentation was not clear on how to set the artifact store path. I had to do a lot of trial and error to get it working.
+
+After going through blogs, it seems like a lot of people are faced with the same issue. So I decided to write a blog on how to deploy MLflow for experiment tracking with Azure Blob Storage as the artifact store.
+
+## Deploying MLflow
+
+First step is to create a new repository in Azure DevOps and follow the steps below. Do create a Azure Blob Storage container and Azure File Share before hand.
+
+### Dockerizing MLflow
+
+The first step is to dockerize MLflow. The `Dockerfile` for MLflow is pretty simple. Here is the dockerfile for MLflow:
+
+```dockerfile
+# Use an official Python runtime as a parent image
+FROM python:3.11-slim
+
+# Run as root user
+USER root
+# Set the working directory in the container
+WORKDIR /mlflow
+
+# Copy the requirements file into the container
+COPY requirements.txt ./
+
+# Install dependencies from requirements file
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the port that MLflow will use
+EXPOSE 80
+
+# Define environment variable for MLflow backend store
+ENV BACKEND_URI /mlflow/mlruns
+# Create the directories for MLflow artifacts and runs
+RUN mkdir -p /mlflow/mlruns
+
+# Copy the startup script into the container
+COPY startup.sh ./
+
+# Make the startup script executable
+RUN chmod +x startup.sh
+
+# Set the container to run the startup script at launch
+CMD ["sh", "./startup.sh"]
+```
+
+The requirements.txt file is as follows:
+
+```txt
+azure-core==1.29.4
+mlflow==2.9.2
+azure-storage-blob==12.19.0
+azure-identity==1.15.0
+python-dotenv==1.0.0
+```
+
+> Note: The `azure-identity` and `azure-storage-blob` are required for using Azure Blob Storage as the artifact store.
+> So the main learning here is that both these packages are essential in both the deployed MLflow server and the client for the MLflow logging to work.
+
+The startup.sh file is as follows:
+
+```sh
+#!/bin/bash
+# This script is executed by the root user at startup.
+
+mlflow server \
+  --backend-store-uri $BACKEND_URI \
+  --artifacts-destination $MLFLOW_ARTIFACT_LOCATION \
+  --default-artifact-root  $MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT \
+  --host 0.0.0.0 \
+  --serve-artifacts \
+  --port 80
+```
+
+Understanding the configuration for MLflow with Azure Blob Storage can be initially perplexing, but it's quite straightforward once explained. The `--artifacts-destination` flag specifies the base URL to the Azure Blob Storage, essentially serving as the entry point for artifact storage. Conversely, the `--default-artifact-root` flag points to a specific directory within the Azure Blob Storage, acting as a dedicated space for the MLflow server's artifacts.
+
+To illustrate, consider an Azure Blob Storage URL like `wasbs://myblobstorage.blob.core.windows.net/` with a container named `mlflow`. In this case, `--artifacts-destination` would be set to `wasbs://myblobstorage.blob.core.windows.net/`, while `--default-artifact-root` would be `wasbs://myblobstorage.blob.core.windows.net/namespace`, where `namespace` represents a designated area for the MLflow server within the storage container.
+
+The necessity of both `--artifacts-destination` and `--default-artifact-root` cannot be overstated; they are critical for establishing a proper communication channel between the MLflow server and Azure Blob Storage. Without the correct configuration of these paths, the server would be unable to interact with the storage, leading to potential data logging issues.
+
+Additionally, the `--serve-artifacts` flag is crucial when you intend to serve artifacts directly from Azure Blob Storage, ensuring that they are accessible for use.
+
+Lastly, the `backend-store-uri` represents the location where the MLflow server stores its run data and metrics. In my setup, I've opted for Azure File Share, but you're free to choose any compatible storage solution that meets your needs.
+
+### Deploying MLflow to Azure Web App Container
+
+The next step is to deploy the dockerized MLflow to Azure Web App Container. The Azure Web App Container is a great way to deploy dockerized applications. It is very easy to deploy and manage. I have used Azure DevOps for CI/CD. The CI/CD pipeline is as follows:
+
+```yaml
+trigger:
+  - main
+
+resources:
+  - repo: self
+
+variables:
+  # App Name - replace with your app name
+  appName: 'mlflow-tracker'
+  # Azure service subscription name
+  azureSubscriptionName: 'My subscription'
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: 'My service connection'
+  imageRepository: 'mlflow'
+  containerRegistry: 'container.azurecr.io'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
+  tag: 'latest'
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    displayName: Build and push stage
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Docker@2
+            displayName: Build and push an image to container registry
+            inputs:
+              command: buildAndPush
+              repository: $(imageRepository)
+              dockerfile: $(dockerfilePath)
+              containerRegistry: $(dockerRegistryServiceConnection)
+              tags: |
+                $(tag)
+
+          ## Add the below snippet at the end of your pipeline
+          - task: AzureWebAppContainer@1
+            displayName: 'Azure Web App on Container Deploy'
+            inputs:
+              azureSubscription: $(azureSubscriptionName)
+              appName: $(appName)
+              containers: $(containerRegistry)/$(imageRepository):$(tag)
+```
+
+This is a simple CI/CD pipeline to build and deploy the dockerized MLflow to Azure Web App Container. The `Dockerfile` is the dockerfile for MLflow. The `appName` is the name of the Azure Web App Container. The `containerRegistry` is the name of the Azure Container Registry. The `azureSubscriptionName` is the name of the Azure subscription. The `dockerRegistryServiceConnection` is the name of the service connection to the Azure Container Registry.
+
+### Setting up Environment Variables
+
+The next step is to set up the environment variables for the MLflow server. The environment variables are as follows:
+
+- `BACKEND_URI`: This is the path to the MLflow server. This is where the MLflow server will store the runs and the metrics. I have used the Azure File Share for this. You can use any storage for this.
+
+- `MLFLOW_ARTIFACT_LOCATION`: This is the path to the Azure Blob Storage. This is like the Base URL for the Azure Blob Storage.
+
+- `MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT`: This is the path to the container in the Azure Blob Storage, which has a kind of a namespace at the end.
+
+- `AZURE_STORAGE_CONNECTION_STRING`: This is the connection string for the Azure Blob Storage. This is required for the MLflow server to be able to communicate with the Azure Blob Storage. You can get the connection string from the Azure Portal by going to the Azure Blob Storage and clicking on the Access Keys and then clicking on the Connection String.
+
+- `AZURE_STORAGE_ACCESS_KEY`: This is the access key for the Azure Blob Storage. This is required for the MLflow server to be able to communicate with the Azure Blob Storage. You can get the access key from the Azure Portal by going to the Azure Blob Storage and clicking on the Access Keys.
+
+Add these to the environment variables in the Azure Web App Container through the application settings in the Azure Portal for the Azure Web App Container.
+
+### Push the code to the repository
+
+- Push the code to the repository and the CI/CD pipeline will be triggered. The dockerized MLflow will be built and deployed to the Azure Web App Container.
+
+- Once the deployment is successful, you can access the MLflow server by going to the URL of the Azure Web App Container. You can see the MLflow server up and running.
+
+## Conclusion
+
+So with that, we have successfully deployed MLflow for experiment tracking. We have dockerized MLflow and deployed it to Azure Web App Container. We have also set up the environment variables for the MLflow server. We have also set up the Azure Blob Storage as the artifact store for the MLflow server. We have also set up the Azure File Share as the backend store for the MLflow server. We have successfully deployed MLflow for experiment tracking.

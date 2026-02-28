@@ -1,0 +1,481 @@
+---
+title: TRPC tutorial
+date: '2023-11-09'
+tags: ['typescript', 'tutorial']
+draft: false
+summary: This blog is about my understanding of using and implementing TRPC
+images: []
+layout: PostLayout
+canonicalUrl: trpc-tut
+authors: ['default']
+---
+
+# TRPC: A type-safe RPC framework for TypeScript
+
+I had know about the buzz around TRPC for a while now. I had seen it being used by
+a lot of people on Twitter and I had also seen a lot of people praising it. I
+came to know that its being used in a new stack called T3 Stack(Tailwind, Typescript, TRPC),
+which is a fullstack framework for building web applications created by [Theo](https://twitter.com/t3dotgg).
+
+## What is TRPC?
+
+[TRPC](https://trpc.io/docs) stands for TypeScript Remote Procedure Call. It is a type-safe RPC framework for TypeScript. Instead of using REST or GraphQL, you can use TRPC to communicate between
+your frontend and backend. It allows yout to easily build & consume fully type-safe
+APIs without any code generation or extra build steps.
+
+## Why TRPC?
+
+- **End-to-end typesafety**: tRPC uses TypeScript to provide full static typesafety for your API endpoints, on both the client and server. This means that you can be sure that your API is always in a consistent state and that type errors will be caught at build time, preventing them from reaching runtime.
+- **Snappy DX**: tRPC has zero dependencies and no build or compile steps. This means that you can start using it immediately and get instant feedback on your changes.
+
+- **Framework agnostic**: tRPC is compatible with all JavaScript frameworks and runtimes. This means that you can use it with your existing codebase and are not locked into any particular framework.
+
+## How does it work?
+
+tRPC uses a simple JSON-based protocol to communicate between the client and server. This means that you can use it with any language or framework that supports JSON. It works by defining your API endpoints as TypeScript interfaces. These interfaces define the inputs and outputs of each endpoint, as well as the errors that can be thrown. tRPC then uses these interfaces to generate a client library that can be used to consume your API from the client side.
+
+They have two main components:
+
+- **Routers**: Routers are the main building blocks of tRPC. They define the endpoints that can be called on your API and the types of their inputs and outputs. Routers can be nested to create a hierarchy of endpoints.
+
+- **Procedure**: Procedures are the functions that are called when an endpoint is called. They are responsible for handling the request and returning a response.
+
+## Getting started
+
+So in this tutorial, I will provide the very basic knowledge and implementations of TRPC in
+a vanilla Vite app and express server.
+
+### Setting up the server
+
+First, we will create a new folder and initialize it with npm.
+
+```bash
+mkdir trpc-tut
+cd trpc-tut
+npm init -y
+```
+
+Now, we will install the dependencies.
+
+```bash
+npm i express @trpc/server @types/express @types/node typescript ts-node
+```
+
+I setup my entrypoint as `api.ts` and below is the code for the same.
+
+```ts
+import express from 'express'
+import cors from 'cors'
+import { createExpressMiddleware } from '@trpc/server/adapters/express'
+import { appRouter } from './routers/index'
+
+const app = express()
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+)
+
+app.use('/trpc', createExpressMiddleware({ router: appRouter }))
+
+app.listen(3000)
+
+export type AppRouter = typeof appRouter
+```
+
+Here, we are creating an express app and using the `createExpressMiddleware` from `@trpc/server/adapters/express` to create a middleware for our express app. We are also using cors to allow requests from our frontend app. We are also exporting the type of our router so that we can use it in our frontend app.
+
+### Setting up the router
+
+Now, we will create a new folder called `routers` and create a file called `index.ts` inside it. This will be our router file. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+
+export const appRouter = t.router({
+  sayHi: t.procedure.query(() => {
+    return 'hi'
+  }),
+  logToServer: t.procedure
+    .input((v) => {
+      if (typeof v === 'string') return v
+
+      throw new Error('invalid input')
+    })
+    .mutation((req) => {
+      console.log(`client says: ${req.input}`)
+      return true
+    }),
+})
+```
+
+Here, we are creating a router using `t.router` and defining two procedures inside it. The first procedure is a query procedure which returns a string. The second procedure is an input procedure which takes a string as input and logs it to the server.
+
+> Note: We are using `t` from `@trpc/server` to create our router. We will see how to create the `t` object in the next section.
+
+### Initiate the TRPC server object
+
+Now, we will create a new file called `trpc.ts` in the root directory of our project. This will be the file where we will create the `t` object. Below is the code for the same.
+
+```ts
+import { initTRPC } from '@trpc/server'
+
+export const t = initTRPC.create()
+```
+
+Here, we are creating the `t` object using `initTRPC.create()` from `@trpc/server`. We will use this object to create our router.
+
+## Setting up the client
+
+For the client, we will create a vanilla Vite project called `client`. And clean up the
+unnecessary code. We will also install the dependency, `@trpc/client` which we will use to
+connect to our server.
+
+```bash
+npm i @trpc/client
+```
+
+- To use the trpc in the client, in our `src/main.ts` we will import the
+  createTRPCProxyClient from `@trpc/client` and create a client object and import the `AppRouter` type from our server.
+
+```ts
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client'
+import { AppRouter } from '../../server/api'
+const client = createTRPCProxyClient<AppRouter>({
+  links: [httpBatchLink({ url: 'http://localhost:3000/trpc' })],
+})
+```
+
+Here, we are creating a client object using `createTRPCProxyClient` from `@trpc/client`. We are also using `httpBatchLink` to connect to our server. We are also importing the `AppRouter` type from our server.
+
+- Now, we will create a main function and in that I will call the `sayHi` procedure as well
+  as the logToServer procedure.
+
+```ts
+async function main() {
+  const result = await client.sayHi.query()
+  console.log(result)
+  client.logToServer.mutate('hello')
+}
+```
+
+Here, we are calling the `sayHi` procedure using `client.sayHi.query()` and logging the result to the console. We are also calling the `logToServer` procedure using `client.logToServer.mutate('hello')` and passing the string `hello` as input.
+
+Now, if you have followed the steps correctly, you should see the following output in your console.
+
+```bash
+hi
+client says: hello
+```
+
+## Code splitting routers
+
+There are two ways you could split the code for routers based on the data models you have.
+
+For example, let's say we have two models `User` and `Post`. We can create two separate router files for each of them. Below is the code for the same.
+
+```ts
+// userRouter.ts
+import { t } from '../trpc'
+
+export const userRouter = t.router({
+  getUserById: t.procedure({
+    input: t.string(),
+    async resolve({ input }) {
+      return {
+        id: input,
+        name: 'John Doe',
+      }
+    },
+  }),
+})
+
+// postRouter.ts
+import { t } from '../trpc'
+
+export const postRouter = t.router({
+  getPostById: t.procedure({
+    input: t.string(),
+    async resolve({ input }) {
+      return {
+        id: input,
+        title: 'Hello World',
+        body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla euismod',
+      }
+    },
+  }),
+})
+```
+
+### Option-1
+
+In the `appRouter` we can import these routers and use them. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+import { userRouter } from './userRouter'
+import { postRouter } from './postRouter'
+
+export const appRouter = t.router({
+  user: userRouter,
+  post: postRouter,
+})
+```
+
+Now, we can call the `getUserById` and `getPostById` procedures from the client. Below is the code for the same.
+
+```ts
+const user = await client.user.getUserById.query('1')
+const post = await client.post.getPostById.query('1')
+```
+
+### Option-2
+
+Another way is to use the `mergeRouters` function from `@trpc/server`. Below is the code for the same.
+
+```ts
+// index.ts
+
+import { t } from '../trpc'
+import { userRouter } from './userRouter'
+import { postRouter } from './postRouter'
+
+export const mergedRouter = t.mergeRouters({
+  user: userRouter,
+  post: postRouter,
+})
+```
+
+Then in the `api.ts` file, import the `mergedRouter` and export that as type. Below is the code for the same.
+
+```ts
+import express from 'express'
+import cors from 'cors'
+import { createExpressMiddleware } from '@trpc/server/adapters/express'
+import { mergedRouter } from './routers'
+
+const app = express()
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+)
+
+app.use('/trpc', createExpressMiddleware({ router: mergedRouter }))
+
+app.listen(3000)
+
+export type AppRouter = typeof mergedRouter
+```
+
+## Custom Procedures
+
+We can also create custom procedures. Let's say that for `User` model, we always
+take an input of type `string` and return an object. We can create a custom procedure for that. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+
+const userProcedure = t.procedure.input((params) => {
+  if (typeof params === 'string') return params
+
+  throw new Error('invalid input')
+})
+
+export const userRouter = t.router({
+  getUserById: userProcedure.query(async ({ input }) => {
+    return {
+      id: input,
+      name: 'John Doe',
+    }
+  }),
+})
+```
+
+### Additional information about procedures
+
+- **Query procedures**: Query procedures are used to fetch data from the server. They are called using the `query` method on the client object. They can be defined using the `t.procedure.query` method.
+
+- **Mutation procedures**: Mutation procedures are used to modify data on the server. They are called using the `mutate` method on the client object. They can be defined using the `t.procedure.mutation` method.
+
+- **Input procedures**: Input procedures are used to validate input data on the server. They are called using the `input` method on the client object. They can be defined using the `t.procedure.input` method.
+
+## Using Zod: A TypeScript-first schema declaration and validation library
+
+[Zod](https://github.com/colinhacks/zod) is simply a TypeScript-first schema declaration and validation library. It is used to validate the input data. We can use it to validate the input data in our procedures. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+import { z } from 'zod'
+
+const userProcedure = t.procedure.input(z.string().nonempty())
+
+export const userRouter = t.router({
+  getUserById: userProcedure.query(async ({ input }) => {
+    return {
+      id: input,
+      name: 'John Doe',
+    }
+  }),
+})
+```
+
+Here, we are using `z.string().nonempty()` to validate the input data. We can also use `z.number()` to validate numbers and `z.boolean()` to validate booleans. We can also use `z.object()` to validate objects. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+import { z } from 'zod'
+
+const userProcedure = t.procedure.input(
+  z.object({
+    id: z.string().nonempty(),
+    name: z.string().nonempty(),
+  })
+)
+
+export const userRouter = t.router({
+  getUserById: userProcedure.query(async ({ input }) => {
+    return {
+      id: input.id,
+      name: input.name,
+    }
+  }),
+})
+```
+
+> This made our code more readable and maintainable. There are lot of other methods in Zod as well,
+> one such method is `nullish()` which can be used to validate nullish values.
+
+> We can concatenate multiple input methods to handle complex input data. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+import { z } from 'zod'
+
+const userProcedure = t.procedure.input(
+  z
+    .object({
+      id: z.string().nonempty(),
+    })
+    .nullish()
+)
+
+export const userRouter = t.router({
+  getUserById: userProcedure
+    .input(
+      z
+        .object({
+          name: z.string().nonempty(),
+        })
+        .nullish()
+    )
+    .query(async ({ input }) => {
+      return {
+        id: input.id,
+        name: input.name,
+      }
+    }),
+})
+```
+
+- Here basically the real input params would be:
+
+```ts
+{
+    id: string | null | undefined,
+    name: string | null | undefined
+}
+```
+
+## Context
+
+We can setup context, which is basically a way to pass data between procedures. It's useful
+for things like authentication, logging, etc.
+
+To setup context, we need to create a new file called `context.ts` in the root directory of our project. Below is the code for the same.
+
+```ts
+import { CreateExpressContextOptions } from '@trpc/server/adapters/express'
+
+export const createContext = ({ req, res }: CreateExpressContextOptions) => {
+  return {
+    req,
+    res,
+    isAdmin: true,
+  }
+}
+```
+
+Here, we are creating a function called `createContext` which takes `req` and `res` as input and returns an object with `req`, `res` and `isAdmin` as properties. We are also exporting the `CreateExpressContextOptions` type from `@trpc/server/adapters/express` which we will use to type the `req` and `res` parameters.
+
+Now, we will import this function in our `api.ts` file and pass it to the `createExpressMiddleware` function. Below is the code for the same.
+
+```ts
+import { createContext } from "./context";
+....
+
+// Rest of the code
+
+app.use("/trpc", createExpressMiddleware({ router: appRouter, createContext }));
+```
+
+Now, we can use the `isAdmin` property in our procedures. Below is the code for the same.
+
+```ts
+import { t } from '../trpc'
+import { z } from 'zod'
+
+const userProcedure = t.procedure.input(z.string().nonempty())
+
+export const userRouter = t.router({
+  getUserById: userProcedure.query(async ({ input, ctx }) => {
+    if (!ctx.isAdmin) throw new Error('not authorized')
+    return {
+      id: input,
+      name: 'John Doe',
+    }
+  }),
+})
+```
+
+Here, we are using the `ctx` parameter to access the `isAdmin` property. We are also throwing an error if the user is not an admin.
+
+## middleware
+
+We can also setup middleware, which is basically a function that runs before every procedure. It's useful for things like authentication, logging, etc. Let's try setting up an `AdminProcedure` middleware. Below is the code for the same.
+
+```ts
+import { initTRPC, inferAsyncReturnType, TRPCError } from '@trpc/server'
+import { createContext } from './context'
+
+type Context = inferAsyncReturnType<typeof createContext>
+export const t = initTRPC.context<Context>().create()
+
+//MiddleWare
+
+const isAdminMiddleWare = t.middleware(({ ctx, next }) => {
+  if (!ctx.isAdmin)
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'You are not authorized to do this',
+    })
+  return next({
+    ctx: {
+      user: { id: 1 },
+    },
+  })
+})
+
+export const adminProcedure = t.procedure.use(isAdminMiddleWare)
+```
+
+Here, we are creating a middleware called `isAdminMiddleWare` which checks if the user is an admin or not. If the user is not an admin, it throws an error. We are also using the `use` method to use the middleware in our procedure.
+
+In this case, if the `isAdmin` property is true, it will return the `next` function which will run the procedure. If the `isAdmin` property is false, it will throw an error.
+
+## Conclusion
+
+So, this was my understanding of TRPC and the basic usage. Now before I just into T3 Stack, I still
+need to learn to use Prisma and then I will be able to use T3 Stack. I will write a blog on that as well.

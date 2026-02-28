@@ -1,0 +1,545 @@
+---
+title: Deploying Django-Nginx app in AWS ec2
+date: '2024-03-16'
+tags: ['Django', 'Web', 'AWS']
+draft: false
+summary: Learn how to seamlessly deploy a robust Django application with Nginx on AWS EC2 to scale your web presence and boost performance.
+images: []
+layout: PostLayout
+canonicalUrl: django-nginx-ec2
+authors: ['default']
+---
+
+# Deploying Django-Nginx app in AWS ec2 🚀
+
+In this tutorial, we will learn how to deploy a Django application with Nginx on AWS EC2. We will also configure the PostgreSQL database and Gunicorn to serve the Django application. We will also set up the static files and media files to be served by Nginx. We will also configure the SSL certificate for the domain using Certbot.
+
+## Prerequisites 📋
+
+Before we start, make sure you have the following prerequisites:
+
+- An AWS account
+- A domain name
+- A basic understanding of Django, Nginx, and AWS
+
+## Step 1: Launch an EC2 instance 🖥️
+
+First, we need to launch an EC2 instance. You can follow the steps below to launch an EC2 instance:
+
+1. Log in to your AWS Management Console.
+2. Navigate to the EC2 dashboard.
+3. Click on the "Launch Instance" button.
+4. Choose an Amazon Machine Image (AMI).
+5. Choose an instance type.
+6. Configure the instance details.
+7. Add storage.
+8. Add tags.
+9. Configure the security group. Make sure to open ports 80, 443, and 22.
+10. Review and launch the instance.
+
+## Step 2: Connect to the EC2 instance 🔌
+
+Once the instance is active, you can first connect to it. You can follow the steps below to connect to the EC2 instance. In the instance details, you will find the "Connect" button. Click on it and follow the instructions to connect to the instance using SSH. Before that make sure you have the key pair to connect to the instance.
+Also, make sure to change the permission of the key pair file using the following command:
+
+```bash
+chmod 400 key-pair.pem
+```
+
+To connect to the instance using they keypair and the public IP of the instance, use the following command:
+
+```bash
+ssh -i "key-pair.pem" user@public-ip
+```
+
+## Step 3: Install Docker and Docker Compose 🐳
+
+The easiest way to deploy a Django application with Nginx is to use Docker and Docker Compose. First, we need to install Docker and Docker Compose on the EC2 instance. You can follow the steps below to install Docker and Docker Compose:
+
+1. Update the package index:
+
+```bash
+sudo apt update
+```
+
+2. There is a convienient script to install Docker. Run the following command to install Docker:
+
+```bash
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+```
+
+3. Add the current user to the docker group:
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+4. Log out and log back in to apply the changes.
+
+- To test the installation, run the following command:
+
+```bash
+docker --version
+```
+
+As output, you should see the version of Docker installed.
+
+## Step 4: Pull the git repository and configure the Django application 🛠️
+
+Now in this step we need to pull in your Django application from the git repository. You can use the following command to clone the repository:
+
+```bash
+git clone <your-repository-url>
+```
+
+This is the time to really configure the Django application with the settings for the production environment.
+
+### Create Dockerfile
+
+Create a file named `Dockerfile` in the root of the project and add the following content:
+
+```Dockerfile
+FROM python:3.11
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /www/app/staticfiles && \
+    mkdir -p /www/app/media
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+WORKDIR /usr/src/app
+COPY requirements.txt /usr/src/app/requirements.txt
+
+RUN pip install --upgrade pip \
+    && pip install -r /usr/src/app/requirements.txt
+
+## entry point bash script
+COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
+
+## start the entrypoint bash script
+ENTRYPOINT ["sh", "/usr/src/app/entrypoint.sh"]
+```
+
+From the above Dockerfile, we have used `ENTRYPOINT` to run the `entrypoint.sh` script. We will create this script in the next step.
+
+### Create entrypoint.sh
+
+Create a file named `entrypoint.sh` in the root of the project and add the following content:
+
+```bash
+#!/bin/bash
+
+# This script is used to start the container for django development
+
+APP_PORT=${PORT:-8000}
+
+## make migrations and migrate for postgres
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py collectstatic --noinput
+
+
+# using gunicorn server
+gunicorn  backend.wsgi:application --bind "0.0.0.0:${APP_PORT}"
+```
+
+> In the above script, we have used `gunicorn` to serve the Django application. We have also used `collectstatic` to collect the static files. So in the next step let's configure static files and media files to be served by Nginx.
+
+#### Static files and media files
+
+In the `settings.py` file, add the following settings to configure the static files and media files:
+
+```python
+MEDIA_URL = "/media/"
+MEDIA_ROOT = "/www/app/media/"
+STATIC_ROOT = "/www/app/staticfiles/"
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+```
+
+With the above settings, we have declared the `STATIC_ROOT` and `MEDIA_ROOT` to be served by Nginx.
+
+## Step 5: Create a Docker Compose file 📝
+
+Create a file named `docker-compose.yml` in the root of the project and add the following content:
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    container_name: django
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - static:/www/app/staticfiles:rw
+      - media:/www/app/media:rw
+      - ./backend:/usr/src/app:rw
+    ports:
+      - '8842:8000'
+    restart: always
+    networks:
+      - main
+```
+
+In the above `docker-compose.yml` file, we have defined a service named `web` which will build the Dockerfile from the `backend` directory. We have also defined the volumes for the static files and media files. We have also defined the port to be exposed. Also, we have defined the network to be used which will come in handy when we configure Nginx.
+
+## Step 6: Configure Nginx 🛠️
+
+### Dockerfile for Nginx
+
+Create a file named `Dockerfile` in the root of the project and add the following content:
+
+```Dockerfile
+FROM nginx:latest
+
+
+# Correct syntax for installing procps
+RUN apt-get update && apt-get install -y procps
+
+
+
+RUN mkdir -p /home/app/staticfiles
+RUN mkdir -p /home/app/media
+```
+
+> In the above Dockerfile, we have used the `nginx` image and created the directories for the static files and media files.
+
+In the `docker-compose.yml` file, add the following service for Nginx:
+
+```yaml
+nginx:
+  container_name: nginx
+  build:
+    context: ./nginx
+    dockerfile: Dockerfile
+  volumes:
+    - static:/home/app/staticfiles:rw
+    - media:/home/app/media:rw
+    - ./nginx:/etc/nginx/conf.d:rw
+  ports:
+    - '80:80'
+  restart: always
+  networks:
+    - main
+  depends_on:
+    - web
+```
+
+- In the above `docker-compose.yml` file, we have defined a service named `nginx` which will build the Dockerfile from the `nginx` directory. We have also used the same volumes for the static files and media files because this way Nginx will be able to serve the static files and media files.
+
+- We can't just have the `nginx` empty. Let's create a directory named `nginx` in the root of the project. Inside the `nginx` directory, create a file named `nginx.conf` and add the following content:
+
+```nginx
+upstream django {
+    server web:8000;
+}
+
+
+# Server block to handle HTTPS
+server {
+    listen 80;
+
+    server_name .domainname.example;
+
+    # Main location block
+    location / {
+        proxy_pass http://django;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        ## additional
+        proxy_redirect off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+    }
+
+    # Static files
+    location /static/ {
+        alias /home/app/staticfiles/;
+    }
+
+    # Media files
+    location /media/ {
+        alias /home/app/media/;
+    }
+}
+```
+
+### Breakdown of the Nginx configuration
+
+- We have defined an upstream block to define the server block for the Django application. Notice that we have used the `web` service name which we defined in the `docker-compose.yml` file. It is important to use the service name because we are using the same network for the services. And docker container can recognize the service name.
+
+- We have defined the server block to handle the HTTP requests. We have defined the `server_name` to be the domain name. We have also defined the `location` block to handle the requests. We have used the `proxy_pass` to pass the requests to the Django application. We have also defined the `location` block to serve the static files and media files.
+
+We are almost done. We need to update the `settings.py` file to use the domain name for the `ALLOWED_HOSTS` setting, `CORS_ALLOWED_ORIGINS` setting, and `CSRF_TRUSTED_ORIGINS` setting and some security settings.
+
+### Update the settings.py file for the production environment
+
+```python
+ALLOWED_HOSTS = ['domainname.example']
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",
+    "http://clientdomain.example",
+]
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+# Allow specific methods
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+```
+
+So what is happening here in the `settings.py` file?
+
+- We have defined the `ALLOWED_HOSTS` to be the domain name. This is important because Django will only serve the requests from the domain name.
+
+- We have defined the `CORS_ALLOW_CREDENTIALS` to be `True` because we are using the `CORS` package to handle the cross-origin requests.
+
+- We have defined the `CORS_ORIGIN_WHITELIST` to allow the requests from the client domain. We have also defined the `CORS_ORIGIN_ALLOW_ALL` to be `False` because we want to allow the requests from the specific domains.
+
+- We have defined the `CORS_ALLOW_METHODS` to allow the specific methods.
+
+Next, setup the security settings:
+
+```python
+
+# Security settings
+# Redirect all non-HTTPS traffic to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Use secure session and CSRF cookies in production
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Set the HttpOnly flag on the session cookie
+SESSION_COOKIE_HTTPONLY = True
+
+# Define the header that your load balancer or reverse proxy uses to indicate a secure connection
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# HTTP Strict Transport Security settings
+SECURE_HSTS_SECONDS = 31536000  # One year
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Prevent client-side JavaScript from accessing the CSRF cookie
+CSRF_COOKIE_HTTPONLY = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://clientdomain.example",
+]
+
+# Ensure your site will only be served over HTTPS and not embedded in a frame
+X_FRAME_OPTIONS = 'DENY'
+```
+
+#### Breakdown of the security settings
+
+- We have defined the `SECURE_SSL_REDIRECT` to be `True` to redirect all non-HTTPS traffic to HTTPS.
+
+- We have defined the `SESSION_COOKIE_SECURE` and `CSRF_COOKIE_SECURE` to be `True` to use secure session and CSRF cookies in production.
+
+- We have defined the `SESSION_COOKIE_HTTPONLY` to be `True` to set the HttpOnly flag on the session cookie.
+
+- We have defined the `SECURE_PROXY_SSL_HEADER` to indicate a secure connection.
+
+- We have defined the `SECURE_HSTS_SECONDS` to be `31536000` to use HTTP Strict Transport Security settings. This means that the browser will remember the HSTS settings for one year. `HSTS` is a web security policy mechanism that helps to protect websites.\_createMdxContent
+
+- We have defined the `CSRF_COOKIE_HTTPONLY` to be `True` to prevent client-side JavaScript from accessing the CSRF cookie.
+
+- We have defined the `CSRF_TRUSTED_ORIGINS` to allow the requests from the specific domains. This is important because we are using the CSRF protection.
+
+- We have defined the `X_FRAME_OPTIONS` to be `DENY` to ensure your site will only be served over HTTPS and not embedded in a frame. This is important to prevent clickjacking attacks.
+
+## Step 7: Setup the SSL certificate using Certbot 🔒
+
+To setup the SSL certificate, we need to install Certbot on the EC2 instance. Certbot uses letsencrypt to provide the SSL certificate.
+
+You can follow the steps below to install Certbot:
+
+### A extra step in AWS EC2
+
+The current EC2 instance, let's say I stopped it. Then the next time I start it, the public IP will change. So to avoid this, we can use an Elastic IP. An Elastic IP is a static IP address designed for dynamic cloud computing. An Elastic IP address is associated with your AWS account. With an Elastic IP address, you can mask the failure of an instance or software by rapidly remapping the address to another instance in your account.
+
+1. In the AWS Management Console, navigate to the EC2 dashboard.
+
+2. In the navigation pane, click on "Elastic IPs".
+
+3. Click on the "Allocate Elastic IP address" button.
+
+4. Click on the "Allocate" button.
+
+5. Click on the "Actions" button and then click on "Associate Elastic IP address".
+
+6. Select the instance and click on the "Associate" button.
+
+Now we have the Elastic IP address associated with the instance. We can use this IP address to point the domain name to the instance.
+
+### Install Certbot
+
+1. Install Certbot:
+
+```bash
+sudo apt install certbot python3-certbot-nginx
+```
+
+2. Obtain the SSL certificate:
+
+```bash
+sudo certbot --nginx  -d domainname.example
+```
+
+3. Test the SSL certificate:
+
+```bash
+sudo certbot renew --dry-run
+```
+
+> Now we have the SSL certificate configured for the domain name. We can use the domain name to access the Django application. The saved SSL certificates are located in the `/etc/letsencrypt/live/domainname.example` directory. We just need to mount the directory to the Nginx service in the `docker-compose.yml` file.
+
+So the complete `docker-compose.yml` file will look like this:
+
+```yaml
+version: '3.8'
+
+services:
+  web:
+    container_name: django
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - static:/www/app/staticfiles:rw
+      - media:/www/app/media:rw
+      - ./backend:/usr/src/app:rw
+    ports:
+      - '8842:8000'
+    restart: always
+    networks:
+      - main
+
+nginx:
+  container_name: nginx_hci
+  build:
+    context: ./nginx/
+  volumes:
+    - static:/home/app/staticfiles:rw
+    - media:/home/app/media:rw
+    - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    - /etc/letsencrypt:/etc/letsencrypt:ro
+
+  ports:
+    - 80:80
+    - 443:443
+  depends_on:
+    - web
+
+  restart: always
+  networks:
+    - main
+volumes:
+  static:
+  media:
+networks:
+  main:
+```
+
+- As you can see, we have mounted the `/etc/letsencrypt` directory to the Nginx service. This way Nginx will be able to use the SSL certificates. And also we have defined the ports `80` and `443` to be exposed.
+
+The final update in the `nginx.conf` file will look like this:
+
+```nginx
+upstream django {
+    server web:8000;
+}
+
+
+# Server block to handle HTTPS
+server {
+    listen 80;
+
+    server_name .domainname.example;
+
+
+    # Main location block
+    location / {
+        proxy_pass http://django;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        ## additional
+        proxy_redirect off;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+    }
+
+    # Static files
+    location /static/ {
+        alias /home/app/staticfiles/;
+    }
+
+    # Media files
+    location /media/ {
+        alias /home/app/media/;
+    }
+
+    listen 443 ssl;
+    # SSL certificate and key locations ## I have to update this
+    ssl_certificate /etc/letsencrypt/live/domainname.example/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/domainname.example/privkey.pem;
+
+}
+
+```
+
+- We have defined the `listen 443 ssl` to handle the HTTPS requests. We have also defined the `ssl_certificate` and `ssl_certificate_key` to use the SSL certificates. This would be the final configuration for the Nginx service. Based on your application you can extend the configuration.
+
+## Step 8: Start the services 🚀
+
+Now we have everything configured. The most easiest step now is to build and start the service 😂
+
+```bash
+docker-compose up --build -d
+```
+
+This will build the services and start the services in the background. You can access the Django application using the domain name. You can also access the Django admin using the domain name followed by `/admin`.
+
+Congratulations! You have successfully deployed a Django application with Nginx on AWS EC2. You could also use the same steps to deploy the Django application with Nginx on other cloud platforms like Google Cloud, Azure, and Digital Ocean.
+
+And also you can configure nginx as load balancer and orchestrate multiple docker containers to scale the application.
+
+## Conclusion 🎉
+
+In this blog post, we have learned to the following:
+
+- Configured Django and Nginx to serve static and media files.
+- Configured SSL certificates using Certbot.
+- Utilized Docker and Docker Compose for Django application deployment.
+- Configured security settings for the Django application.
+- Demonstrated domain name usage for accessing the Django application.
+- Employed Elastic IP to maintain consistent public IP for EC2 instances.
+- Utilized Nginx as a reverse proxy for serving the Django application.
+- Leveraged Nginx as a load balancer to orchestrate multiple Docker containers for application scaling.
+
+I hope you enjoyed this tutorial and found it helpful.

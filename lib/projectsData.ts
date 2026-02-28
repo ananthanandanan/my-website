@@ -1,7 +1,8 @@
 export interface Project {
   title: string;
   description: string;
-  href: string;
+  /** Optional when there is no public URL (e.g. stealth SaaS on client premises). */
+  href?: string;
   tools: string[];
   deployed?: boolean; // true = Live, false = Archive
 }
@@ -11,32 +12,31 @@ export const projectsData: Project[] = [
     title: "QuestCraft",
     description:
       "LLM-powered platform that helps teachers create better assessments more efficiently.",
-    href: "https://questcraft.example.com",
-    tools: ["Django", "LangChain", "PostgreSQL"],
+    tools: ["Django", "LangChain", "PostgreSQL", "Docker", "RabbitMQ", "Next.js", "Logto", "Redis", "Celery"],
     deployed: true,
   },
   {
-    title: "Lazzzy-Space",
+    title: "Reg-Exp-Lain",
     description:
-      "A web app for teams to collaborate and manage tasks with a minimal interface.",
-    href: "https://lazzzy.example.com",
-    tools: ["Next.js", "Django", "GraphQL"],
+      "Interactive regular expression visualizer built with Next.js and React Flow. Visualize regex as flow diagrams, test strings in real time, and get step-by-step explanations.",
+    href: "https://github.com/ananthanandanan/Reg-Exp-Lain",
+    tools: ["Next.js", "React 19", "React Flow", "TypeScript", "Tailwind CSS", "Zustand", "regjsparser"],
     deployed: true,
   },
   {
-    title: "Passman",
+    title: "Json_To_Many",
     description:
-      "A command line password manager built with JavaScript. Generates and copies to clipboard.",
-    href: "#",
-    tools: ["JavaScript", "CLI"],
-    deployed: false,
+      "Python package for seamless conversion from JSON to Markdown, XML, and CSV. Built with uv and Ruff for developers and data workflows.",
+    href: "https://github.com/ananthanandanan/Json_To_Many",
+    tools: ["Python", "uv", "Ruff"],
+    deployed: true,
   },
   {
-    title: "Django Chatbot",
+    title: "LangDjangoChat",
     description:
-      "Real-time LLM chatbot using Django Channels, DRF, and LangChain for seamless API integration.",
-    href: "#",
-    tools: ["Django", "WebSockets", "LLM"],
+      "LLM-based chatbot with Django and Solara UI. Real-time chat, multiple chatrooms, and user authentication.",
+    href: "https://github.com/ananthanandanan/LangDjangoChat",
+    tools: ["Django", "Django Channels", "DRF", "Huey", "Redis", "Solara"],
     deployed: false,
   },
 ];

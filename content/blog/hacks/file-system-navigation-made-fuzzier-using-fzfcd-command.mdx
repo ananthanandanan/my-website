@@ -1,0 +1,45 @@
+---
+title: File system navigation made fuzzier using fzf-cd command
+date: '2023-10-20'
+tags: ['productivity', 'linux', 'setup']
+draft: false
+summary: You can make you file navigation easier through coupling of both cd and fzf
+images: []
+layout: PostLayout
+canonicalUrl: fzf-with-cd-setup
+authors: ['default']
+---
+
+# File system navigation made fuzzier using fzf-cd command
+
+## Introduction
+
+One of the things that I found really hintering my productivity is the time I spend navigating through the file system. I have been using the `cd` command for a long time and I have been using the `fzf` for a while, in my _neovim_ setup(which is pretty neat by the way). But in my day to day work, I have to navigate through the file system a lot. So I thought why not combine the two and make my life easier. So I did and I am going to share it with you. This will be a quick guide on how to setup the `fzf-cd` command.
+
+## Prerequisites
+
+- `fzf` installed
+
+> If you don't have `fzf` installed, you can follow the [official guide](https://github.com/junegunn/fzf) to install it.
+
+## Setup
+
+Go to your `~/.bashrc` or `~/.zshrc` file and add the following lines at the end of the file.
+
+```bash
+# fzf-cd
+fcd() {
+  local directory
+  directory=$(find * -type d 2>/dev/null | fzf +m) && cd "$directory"
+}
+```
+
+Now, you can either restart your terminal or run `source ~/.bashrc` or `source ~/.zshrc` to load the changes.
+
+That's it. Now you can use the `fcd` command to navigate through the file system. You can also use the `fcd` command with the `zsh` plugin `zsh-autosuggestions` to make it even more easier.
+
+<div className="flex justify-center">![fcd-gif](/gifs/fcd.gif)</div>
+
+## Conclusion
+
+I hope you found this guide useful. If you have any questions or suggestions, feel free to reach out to me on [twitter](https://twitter.com/Ananthan2k).

@@ -1,0 +1,314 @@
+---
+title: All you need git
+date: '2023-01-12'
+tags: ['Git']
+draft: false
+summary: Git is a powerful version control system, and here are some good practices and commands I use day to day basis.
+images: []
+layout: PostLayout
+canonicalUrl: all-you-need-git
+authors: ['default']
+---
+
+# What is Git ?
+
+Git is a powerful tool for version control, and it can be a bit daunting for new users to learn all of its commands
+and features. In this blog post, I'll share some Git commands and tips that I've learned through experience that I
+think would be particularly beneficial for new users and those who are still learning.
+
+## Git Commands
+
+### git init
+
+The `git init` command is used to create a new Git repository. It can be done in two ways:
+
+1. Create a new directory and navigate into it, then run `git init`.
+2. Run `git init` in an existing directory.
+
+```bash
+git init
+```
+
+### git clone
+
+The `git clone` command is used to obtain a Git repository from an existing URL. It can be done in two ways:
+
+1. Clone a repository into a newly created directory.
+2. Clone a repository into an existing directory.
+
+```bash
+git clone [url]
+```
+
+### git add
+
+The `git add` command adds a change in the working directory to the staging area. It can be done in two ways:
+
+1. Add a file's changes to the staging area.
+2. Add all new and changed files to the staging area.
+
+```bash
+git add [file]
+git add .
+```
+
+### Add or Delete remote git repository url
+
+The way the changes made in a local repository are shared with others is by pushing the changes to a remote repository.
+The `git remote` command is used to view the list of remote repositories. And the `git remote add` command is used to add a new remote
+repository, while the `git remote remove` command is used to delete an existing remote repository. It's through these assigned url
+that the changes made in the local repository are pushed to the remote repository.
+
+```bash
+git remote add [remote-name] [url]
+git remote remove [remote-name]
+```
+
+### Unstage changes
+
+From my experience, I've found that using the `git restore` command is the easiest way to unstage changes.
+It can be done in `4` ways:
+
+1. Unstage a single file's changes.
+2. Unstage all files' changes.
+3. An alternate way to unstage all files' changes, using `--staged` flag.
+4. Bonus tip: use `git checkout` to unstage all files' changes.
+
+```bash
+git restore [file]
+git restore .
+git restore --staged .
+git checkout .
+```
+
+### git commit
+
+The `git commit` command is used to save the changes in the staging area to the local repository.
+It can be done in three ways:
+
+1. Commit a file's staged changes.
+2. Commit a snapshot of all staged changes.
+3. Commit a snapshot of all staged changes, and commit all files that are already tracked.
+
+```bash
+git commit -m "[message]"
+git commit -a
+git commit -am "[message]"
+```
+
+### Uncommit changes
+
+This is the part where as a new user, I struggled the most. I've found that using the `git reset` command is the
+easiest way to uncommit changes, in different forms.
+
+1. Uncommit most recent commit, keep the changes staged.
+2. Uncommit most recent commit, and unstage the changes.
+3. Uncommit most recent commit, and unstage the changes, and delete the changes. In short, it's like the commit never happened.
+
+```bash
+git reset --soft HEAD^
+git reset HEAD^
+git reset --hard HEAD^
+```
+
+> Note: The `^` symbol is used to refer to the parent of the current commit. If you want to uncommit the second most recent commit, you can use `HEAD^^`.
+
+### Rename commit message
+
+The `git commit --amend` command is used to change the most recent commit's message.
+
+1. Amend the most recent commit's message.
+
+```bash
+git commit --amend -m "[message]"
+```
+
+> Hack tip => You can also use this command to add new changes to the most recent commit. Just stage the new changes, and run the command.
+> This is done in `feature` branches, where you already have made a commit and you wanted to make some changes on top of it.
+> For the sake of creating PRs and code reviews, one commit per feature or PR is preferred.
+
+### git push
+
+The `git push` command is used to push the changes in a local repository to a remote repository. If you want to force push the changes,
+then you can use the `--force` flag.
+
+```bash
+git push [remote-name] [branch]
+git push --force [remote-name] [branch]
+```
+
+### git status
+
+The `git status` command is used to list all new or modified files to be committed.
+
+```bash
+git status
+```
+
+### git log
+
+The `git log` command is used to list the version history for the current branch. It can be done in two ways:
+
+1. List version history for the current branch.
+2. List version history for the current branch, including all commits from all branches and remotes. In a graph format.
+
+```bash
+git log
+git log --all --graph --decorate --oneline
+```
+
+### Create new branch, switch to it, rename it, and delete it
+
+The `git branch` command is used to create, list, rename, and delete branches. It can be done in `4` ways:
+
+1. Create a new branch.
+2. List all branches.
+3. Rename a branch.
+4. Delete a branch.
+
+```bash
+git branch [branch-name]
+git branch
+git branch -m [old-branch-name] [new-branch-name]
+git branch -d [branch-name]
+```
+
+- To switch to a branch, use the `git checkout` command.
+
+```bash
+git checkout [branch-name]
+```
+
+- To delete branch from remote repository, use the `git push` command.
+
+```bash
+git push [remote-name] --delete [branch-name]
+```
+
+### git Stash
+
+The stash command temporarily stores all the modified tracked files. This comes to use when you have some changes that you don't want to commit immediately
+or the feature you add might break the current code. You can stash the changes and then apply them later. This can be done using command:
+
+```bash
+git stash
+```
+
+- You can also provide a tag to the stash command to identify the stash later.
+
+```bash
+git stash save [tag]
+```
+
+- To apply the stash, use the `git stash apply` command.
+
+```bash
+git stash apply [stash@{0}]
+```
+
+- Or you can use the `git stash pop` command to apply the stash and delete it.
+
+```bash
+git stash pop [stash@{0}]
+```
+
+> Note: The `stash@{0}` is the tag of the stash. If you don't provide any tag, then it will apply the most recent stash. If you want to
+> see all the stashes, use the `git stash list` command.
+
+- To delete a stash, use the `git stash drop` command.
+
+```bash
+git stash drop [stash@{0}]
+```
+
+### Cherry pick
+
+One of the commands that I use the most is the `git cherry-pick` command. It's used to apply the changes introduced by some existing commits.
+
+1. Apply changes introduced by some existing commit, by specifying the commit hash.
+
+```bash
+git cherry-pick [commit-hash]
+```
+
+This is useful when you want to apply some changes from a branch to another branch. For example, you have a `feature` branch, and you
+want to apply some changes from it to the `master` branch.
+
+### Squash commits
+
+This a hell for new users, where they end up with a lot of commits in `feature` branch, and they want to squash them into one commit.
+The `git rebase` command is used to reapply commits on top of another base tip.
+
+I use the `git rebase -i` command to squash commits.
+
+```bash
+git rebase -i HEAD~[number-of-commits]
+```
+
+- After that a text editor will open up, where you can specify the commits you want to squash. For example,
+  if you want to squash the last 3 commits, then you can use `HEAD~3` as the base tip. And then you can specify the commits you want to squash.
+  To make it less confusing, I usually use `reword` or `r` for the last commit, and `fix` or `f` for the rest of the commits. These should
+  replace the `pick` or `p` in the text editor. After that save it and another text editor will open up, where you can specify the commit message.
+
+### Update local repository with remote repository
+
+This is pretty personal choice, but what worked for me was to use `git fetch` along with `git rebase`, this synergy worked out
+for me. The `git fetch` command is used to fetch the changes from the remote repository. And the `git rebase` command is used to
+reapply commits on top of another base tip.
+
+```bash
+git fetch [remote-name]
+git rebase [remote-name]/[branch-name]
+```
+
+> I don't prefer using `git pull` or `git merge` because it creates a merge commit, which is not preferred in `feature` branches.
+
+## Submodules
+
+Submodules are used to include another Git repository within a repository. It can be done in two ways:
+
+1. Add a submodule.
+2. Update a submodule.
+
+```bash
+git submodule add -b [remote-branch] [remote-repository-url]
+git submodule update --remote --merge
+```
+
+- To clone a repository with submodules use the `--recursive` flag.
+
+```bash
+git clone --recursive [remote-repository-url]
+```
+
+## Safety Net - Reflog
+
+The `git reflog` command is used to list the commits that were recently checked out. It can be used to recover from mistakes.
+This is the last resort, when you have done some dumb action and you want to recover from it.
+
+```bash
+git reflog
+```
+
+## Handling Merge Conflicts through - ours and theirs
+
+The `git rebase` command is one of the most powerful and verstatile commands in Git. It can be used to reapply commits on top of another base tip, rename commits, squash commits, and handle merge conflicts.
+
+When you have a merge conflict, you can use the `ours` and `theirs` options to resolve the conflict.
+
+1. Use `ours` option to keep the changes from the current branch.
+2. Use `theirs` option to keep the changes from the branch being merged.
+
+```bash
+git rebase -X ours [branch-name]
+git rebase -X theirs [branch-name]
+```
+
+How this would work is, when you have a merge conflict, you can use the `ours` option to keep the changes from the current branch, and the `theirs` option to keep the changes from the branch being merged. Its one of those time saving commands, where you don't have to manually resolve the conflicts.
+
+> Note: The `ours` and `theirs` options are used to resolve the conflicts in favor of the current branch or the branch being merged. So use them wisely.
+
+## Conclusion
+
+In this post, I've covered the most common Git commands that I use on a daily basis. I hope this post will help you to get started with Git.
+If you have any questions, feel free to ping me on Twitter, LinkedIn. I'll be happy to help you out.

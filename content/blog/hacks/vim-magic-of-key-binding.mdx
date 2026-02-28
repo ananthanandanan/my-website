@@ -1,0 +1,128 @@
+---
+title: Vim - magic of key binding
+date: '2023-01-09'
+tags: ['vim', 'text-editor']
+draft: false
+summary: Vim is highly configurable text editor, which is built for creating/inserting/deleting or making changes in a very efficient way.
+images: []
+layout: PostLayout
+canonicalUrl: vim-editor
+authors: ['default']
+---
+
+I decided to write this blog, after I tried my hands on using vim editor. I got to know about it from reading other posts like , " the war of editor"
+for example. So this tempted me to try it out. I didn't had that much expectation, since all I knew was that it looked like prehistoric boring text editor.
+But Oh boy was I wrong. so lets share my experience and the setup that I use currently.
+
+# What is vim?
+
+I would describe vim as a highly configurable text editor, which is built for creating/inserting/deleting or making changes in a very efficient way.
+It is pretty fast and stable. There are a lot of features thats hidden from our naked eyes. It is often compared with another text editor, called emac.
+They fall under the famous "war of editor".
+
+<div className="flex justify-center">
+  ![vim-emac](/static/images/individualBlogPostImages/vim-emac.png)
+</div>
+
+## The learning curve
+
+Yes, initially it will feel very daunting and scary. But if we can spend a week exploring and understanding its mechanics, searching how to set the
+key binding, which is the key standout😃.
+
+But when you get comfortable with it, you will soon understand it is a pandora box of customisations. So when you get over that learning curve it
+will be a breeze.
+
+## Why use it ? 🤔
+
+Well that depends on the user, it could vary depending on what you are working on. For me I felt comfortable using it as a secondary text editor
+whereas vscode as my primary. This basically means that I use vscode for editing large projects and for quick edits or for small projects I use vim. The
+next attraction, are the numerous plugins that is created by the vast community. If you spend sometimes researching about it, you can have a repertoire of
+useful plugins, which will make your coding experience even easier. There are many plugins out there, some of the ones that I use are YouCompleteMe - for
+awesome code completion, the best in my opinion 💪, gitgutter - for keeping track of git changes, gruvbox for the best theme and the famous nerdtree.
+When it comes to key binding it takes time and experimenting is th key. I found what I felt was comfortable for me. So I will share it below.
+
+---
+
+```c
+syntax on
+
+set noerrorbells
+set tabstop=4 softtabstop=4
+set shiftwidth=4
+set expandtab
+set smartindent
+set nu
+set nowrap
+set smartcase
+set noswapfile
+set nobackup
+set undodir=~/.vim/undodir
+set undofile
+set incsearch
+
+set colorcolumn=80
+highlight ColorColumn ctermbg=0 guibg=lightgrey
+
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'morhetz/gruvbox'
+Plug 'jremmen/vim-ripgrep'
+Plug 'tpope/vim-fugitive'
+Plug 'leafgarland/typescript-vim'
+Plug 'vim-utils/vim-man'
+Plug 'lyuts/vim-rtags'
+Plug 'https://github.com/ctrlpvim/ctrlp.vim.git'
+Plug 'https://github.com/ycm-core/YouCompleteMe.git'
+Plug 'https://github.com/airblade/vim-gitgutter.git'
+Plug 'mbbill/undotree'
+Plug 'https://github.com/preservim/tagbar.git'
+Plug 'preservim/nerdtree'
+Plug 'itchyny/lightline.vim'
+
+call plug#end()
+
+colorscheme gruvbox
+set background=dark
+
+let mapleader = " "
+let g:netrw_browse_split=2
+let g:netrw_banner=0
+let g:netrw_winsize = 25
+
+let g:ctrlp_use_caching = 0
+
+nnoremap <leader>h :wincmd h<CR>
+nnoremap <leader>j :wincmd j<CR>
+nnoremap <leader>k :wincmd k<CR>
+nnoremap <leader>l :wincmd l<CR>
+nnoremap <leader>u :UndotreeShow<CR>
+nnoremap <leader>po :wincmd v<bar> :Ex <bar> :vertical resize 30<CR>
+nnoremap <leader>+ :vertical resize +5<CR>
+nnoremap <leader> - :vertical resize -5<CR>
+nnoremap <leader>n :NERDTreeToggle<CR>
+nnoremap <silent> <Leader>gd :YcmCompleter GoTo<CR>
+nnoremap <silent> <Leader>gf :YcmCompleter FixIt<CR>
+
+
+" Start NERDTree and leave the cursor in it.
+autocmd VimEnter * NERDTree | wincmd p
+
+highlight GitGutterAdd guibg=#009900 ctermbg=Green
+highlight GitGutterChange guibg=#bbbb00 ctermbg=Yellow
+highlight GitGutterAdd guibg=#ff2222 ctermbg=Red
+let g:gitgutter_enabled = 1
+let g:gitgutter_map_keys = 0
+```
+
+---
+
+## Conclusion
+
+So from my experience till now its worth putting in an effort to try out vim, you wanna look like hardcore developer 😉 or for a productive workflow. But at the end the day, its your preference, find what suits you. Vim is not for everyone and different people have different taste in text editors, and there are a bunch of them out there. So with that, until my next post, Adios.
+
+## Resources
+
+- [vim cheatsheet](https://vimsheet.com/)
+- [A tutorial](https://www.youtube.com/watch?v=n9k9scbTuvQ&t=816s)
+- [Vim plugins](https://vimawesome.com/)

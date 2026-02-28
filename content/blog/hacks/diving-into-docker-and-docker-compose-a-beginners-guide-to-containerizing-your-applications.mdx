@@ -1,0 +1,602 @@
+---
+title: Diving into Docker and Docker Compose - A beginner's guide to containerizing your applications
+date: '2023-01-17'
+tags: ['Devops', 'Docker', 'Basics']
+draft: false
+summary: Stack up your containers, learn the basics and some helpful principles to follow when using Docker and Docker Compose.
+images: []
+layout: PostLayout
+canonicalUrl: docker-basics
+authors: ['default']
+---
+
+# What is Docker and Docker Compose?
+
+Docker is a platform that allows developers to easily create, deploy, and run applications
+in containers. Containers are lightweight, portable, and self-sufficient, making them a great
+solution for deploying applications in a consistent and predictable environment.
+
+Docker Compose is a tool for defining and running multi-container Docker applications.
+It allows you to define your application's services, networks, and volumes in a single
+`docker-compose.yml` file, and then start and stop all of the services with a single command.
+
+In this tutorial, we will learn how to use Docker and Docker Compose to create a simple web application.
+We will start by creating a `Dockerfile` that describes the application's environment, then we will create a
+`docker-compose.yml` file that defines the application's services, networks, and volumes.
+
+## Prerequisites
+
+To follow along with this tutorial, you will need to have Docker and Docker Compose installed on your machine.
+You can download Docker from [here](https://www.docker.com/products/docker-desktop) and Docker Compose from [here](https://docs.docker.com/compose/install/).
+
+## Creating a Dockerfile
+
+A Dockerfile is a script that contains instructions for building a Docker image. It specifies the base image, the application's
+dependencies, and any additional configuration that is needed to run the application.
+
+Here is an example Dockerfile for a simple web application:
+
+```dockerfile
+FROM node:14
+
+WORKDIR /app
+
+COPY package.json .
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "start"]
+
+```
+
+This Dockerfile starts with the `node:14` base image, which comes with Node.js 14 and npm pre-installed. It then sets the working
+directory to`/app`, copies the `package.json` file and runs `npm install` to install the application's dependencies. Finally, it copies
+the rest of the application files and starts the application with the `npm start` command.
+
+### Docker instructions
+
+- `FROM`: The `FROM` instruction specifies the base image for the Docker image. It takes a single argument, which is the name of the base image.
+- `WORKDIR`: The `WORKDIR` instruction sets the working directory for any `RUN`, `CMD`, `ENTRYPOINT`, `COPY`, and `ADD` instructions that follow
+  it in the Dockerfile.
+- `COPY`: The `COPY` instruction copies new files or directories from `<src>` and adds them to the filesystem of the container at the path `<dest>`.
+- `RUN`: The `RUN` instruction executes any commands and installs any packages or other requirements needed to run the application. It executes
+  any commands in a new layer on top of the current image and commits the results. The `layer` is temporary and is only used for the build process.
+  The resulting committed image will be used for the next step in the Dockerfile. A `layer` is a temporary
+- `CMD`: The `CMD` instruction provides default arguments for an executing container. There can only be one `CMD` instruction in a Dockerfile.
+  If you list more than one `CMD` then only the last `CMD` will take effect.
+- `ENTRYPOINT`: The `ENTRYPOINT` instruction allows you to configure a container that will run as an executable. The `ENTRYPOINT` instruction can
+  be overridden from the command line when docker container runs.
+- `ADD`: The `ADD` instruction copies new files, directories or remote file URLs from `<src>` and adds them to the filesystem of the container at the path `<dest>`.
+  The main difference between `COPY` and `ADD` is that `COPY` only supports the basic copying of local files into the container, while `ADD` has some
+  extra features like local-only tar auto-extraction and remote URL support. The `ADD` instruction is discouraged, as it has a few problems with
+  path handling and permissions. It is better to use `COPY` unless you are absolutely sure that you need `ADD`'s features.
+- `ENV`: The `ENV` instruction sets the environment variable `<key>` to the value `<value>`. This value will be in the environment for all
+  subsequent `RUN`, `CMD`, and `ENTRYPOINT` instructions in the `Dockerfile`.
+- `EXPOSE`: The `EXPOSE` instruction informs Docker that the container listens on the specified network ports at runtime. You can specify
+  whether the port listens on `TCP` or `UDP`, and the default is `TCP` if the protocol is not specified.
+- `USER`: The `USER` instruction sets the user name (or UID) and optionally the user group (or GID) to use when running the image and for any
+  `RUN`, `CMD`, and `ENTRYPOINT` instructions that follow it in the `Dockerfile`.
+
+> Pro Tip => Only have one `CMD` or `ENTRYPOINT` instruction in your Dockerfile. If you have more than one, only the last instruction will take effect.
+
+## Building the Docker image
+
+Once we have our `Dockerfile`, we can use the `docker build` command to build the Docker image. The `docker build` command takes a `-t` option to
+specify the name and optionally a tag in the 'name:tag' format for the image in the `docker` registry or local.
+
+```bash
+docker build -t myapp:latest .
+```
+
+This command will build the image and tag it as `myapp:latest`. The `.` at the end of the command specifies the build context, which is the current directory.
+
+## Running the Docker container
+
+Once we have our Docker image, we can use the `docker run` command to run the application in a container. The `docker run` command takes a `-p` option to
+specify the port mapping between the host and the container. The format is `hostPort:containerPort`.
+
+```bash
+docker run -p 3000:3000 myapp:latest
+```
+
+This command will run the `myapp:latest` image and map the container's port 3000 to the host's port 3000. You can now access the application at `http://localhost:3000`.
+
+- So we have a Dockerfile that describes the application's environment, and we can use it to build a Docker image and run the application in a container. Then
+  why do we need Docker Compose?
+
+## Docker Compose vs Docker
+
+Docker Compose is a tool for defining and running multi-container Docker applications. It allows you to define your application's services, networks, and volumes in a
+single `docker-compose.yml` file, and then start and stop all of the services with a single command.
+
+Docker Compose is a great tool for development and testing, but it is not meant for production. In production, you should use a container orchestration tool like Kubernetes
+or Docker Swarm to manage your containers.
+
+## Creating a docker-compose.yml file
+
+A `docker-compose.yml` file is a YAML file that defines the application's services, networks, and volumes. Here is an example `docker-compose.yml` file for our simple web application:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - './app:/app'
+```
+
+This file starts with a `version` key that specifies the version of the `docker-compose.yml` file format. It then defines a `services` key that contains the application's services.
+In this case, we have a single service called `web`. The `web` service uses the `myapp:latest` image, maps the container's port 3000 to the host's port 3000, and mounts the `./app` directory
+on the host as `/app` in the container.
+
+## Running the application with Docker Compose
+
+Once we have our `docker-compose.yml` file, we can use the `docker-compose up -d --build` command. The `docker-compose up` command starts and runs the application's services.
+The `-d` option runs the containers in the background and leaves them running. The `--build` option builds the images before starting the containers.
+
+```bash
+docker-compose up -d --build
+```
+
+This command will start the `web` service and run the application in a container. You can now access the application at `http://localhost:3000`.
+
+## Stopping the application with Docker Compose
+
+Once we are done with our application, we can use the `docker-compose down` command to stop and remove the containers, networks, and volumes.
+
+```bash
+docker-compose down
+```
+
+This command will stop and remove the `web` service and the `myapp` network.
+
+## volumes
+
+The `volumes` key is used to mount host directories as data volumes in the container. It takes a list of host paths or named volumes, or an object with configuration options.
+There are two types of volumes in docker. The first type is a `bind mount`, which is a file or directory on the host machine that is mounted into a container. The second type is a
+`named volume`, which is managed by Docker. Named volumes are stored in a special location within the host machine's filesystem. You should use bind mounts for development and named
+volumes for production.
+
+### Bind mounts
+
+Bind mounts are the most flexible type of volume. They allow you to mount a file or directory from the host machine into a container. The file or directory is referenced by its
+absolute path on the host machine. Here is an example bind mount:
+
+```yaml
+volumes:
+  - /host/path:/container/path
+```
+
+### Named volumes
+
+Named volumes are easier to use than bind mounts. When you mount a named volume, a new directory is created within Docker's storage directory on the host machine. The new directory
+has the same name as the volume. Here is an example named volume:
+
+```yaml
+volumes:
+  - myvolume:/container/path
+```
+
+> Pro Tip: You can use the `docker volume ls` command to list all of the named volumes on your machine.
+> You can use the `docker volume rm` command to remove a named volume.
+> You can use the `docker volume prune` command to remove all unused named volumes.
+> You can use the `docker volume inspect` command to inspect a named volume.
+> You can use the `docker volume create` command to create a named volume. This is to create a named volume without using it in a service.
+
+### When to use bind mounts and when to use named volumes?
+
+You should use bind mounts for development and named volumes for production. Bind mounts are more flexible than named volumes, but they are harder to use. Bind mounts are dependent
+on the directory structure and filesystem of the host machine. If you move your project directory to another machine, the bind mount will not work. Named volumes are easier to use
+because they are independent of the directory structure and filesystem of the host machine. However, they are not as flexible as bind mounts.
+
+- You can also share named volumes or bind mounts between multiple containers or services. This is useful for sharing data between containers. Here is an example of a service that
+  shares a named volume with another service:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+volumes:
+  myvolume:
+```
+
+## Use of depends_on key
+
+The `depends_on` key is used to define a dependency between services. It takes a list of service names that the current service depends on. Here is
+an detailed example of `depends_on`:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+  db:
+    image: postgres:latest
+volumes:
+  myvolume:
+```
+
+- What this means is that the `web` service depends on the `db` service. The `worker` service does not depend on any other services. The `db` service does not depend on any other services.
+- In other words for the `web` service to start, the `db` service must be running. For the `worker` service to start, the `db` service does not need to be running.
+  For the `db` service to start, no other services need to be running.
+
+## Use of context and dockerfile in docker compose
+
+The `context` key is used when you want to build an image from a Dockerfile instead of using an image from a DockerHub repository or local host machine. It takes a path to the directory
+that contains the Dockerfile. Here is an example of a service that builds an image from a Dockerfile:
+
+```yaml
+version: '3'
+services:
+  web:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+  db:
+    image: postgres:latest
+volumes:
+  myvolume:
+```
+
+## Ports
+
+We use the `port` key to expose the ports of the container to the host machine. It takes a list of ports or an object with configuration options.
+Each port is defined as `HOST:CONTAINER`. Here is an example of a service that exposes ports:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+  db:
+    image: postgres:latest
+volumes:
+  myvolume:
+```
+
+- In simple terms, this means that the `web` service exposes port `3000` on the host machine and forwards that traffic to port `3000` on the container.
+- You can provide a list of ports to expose multiple ports. Here is an example of a service that exposes multiple ports:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+      - '3001:3001'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+  db:
+    image: postgres:latest
+volumes:
+  myvolume:
+```
+
+## Networks
+
+The `networks` key is used to define the application's networks. It takes a list of network names or an object with configuration options. Here is an example of a service that
+uses a network:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+    networks:
+      - mynetwork
+  db:
+    image: postgres:latest
+    networks:
+      - mynetwork
+volumes:
+  myvolume:
+networks:
+  mynetwork:
+```
+
+- In simple terms, this means that the `web` service, the `worker` service, and the `db` service are all connected to the same network called `mynetwork`.
+- This is useful for services that need to communicate with each other. For example, the `web` service needs to communicate with the `db` service.
+  The `worker` service does not need to communicate with any other services.
+
+A good example of this so called communication between `web` and `db`, let's say in a real world scenario, is when you have a web application that needs to store data in a database.
+The `web` service needs to communicate with the `db` service to store and retrieve data. By default, all services are connected to a default network that is named after the name of
+the current directory. You can use the `docker network ls` command to list all of the networks on your machine. You can use the `docker network inspect` command to inspect a network.
+
+The above `mynetwork` is not required to be created explicitly. It is created automatically when you run the `docker-compose up` command. You can also create a network explicitly
+using the `docker network create` command. This is to create a network without using it in a service.
+
+### Different types of networks
+
+There are 7 different types of networks that you can use in your application. They are `bridge`, `host`, `none`, `overlay`, `macvlan`, `ipvlan`, and `custom`.
+
+- `bridge` is the default network. It is a private network that is created automatically for you. It is the most common type of network. It is the network that
+  is used when you do not specify a network.
+- `host` is a special type of network that is used to bypass the network stack. It is not recommended to use this type of network in production. In simple terms,
+  it means that the container will use the host machine's network stack. This is useful for services that need to communicate with the host machine.
+- `none` is a special type of network that is used to disconnect a container from the network stack. It is not recommended to use this type of network in production.
+  In simple terms, it means that the container will not be connected to any network. This is useful for services that do not need to communicate with any other services.
+- `overlay` is a special type of network that is used to connect multiple Docker daemons together. It is not recommended to use this type of network in production.
+- `macvlan` is a special type of network that is used to connect a container to a physical network interface. It is not recommended to use this type of network in production.
+- `ipvlan` is a special type of network that is used to connect a container to a physical network interface. It is not recommended to use this type of network in production.
+- `custom` is a special type of network that is used to create a custom network. It is not recommended to use this type of network in production.
+
+If that was still confusing, I will talk about it like how I picture it.
+
+Docker is a way to make little computer rooms in your big computer. These little rooms are called containers, and they can talk to each other
+if they are in the same network. The default network is called `bridge` and it's like a big playground where all the containers can play together.
+Sometimes, you want a container to play outside of the playground and talk to the big computer, that's when you use the `host` network. Sometimes you
+want a container to be alone and not talk to anyone, that's when you use the `none` network. There are other types of networks, like `overlay` which lets
+two playpens talk to each other, or `macvlan` and `ipvlan` that let the container talk directly to the big computer, but those are for more advanced players.
+They are not recommended for beginners. And finally, there is the `custom` network, which is like a playground that you can make yourself. It's not recommended
+for beginners, but it's a good way to learn about networks.
+
+## Environment Variables
+
+The `environment` key is used to define environment variables. It takes a list of environment variable names or an object with configuration options. Here is an example of a service
+that uses environment variables:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+    networks:
+      - mynetwork
+  db:
+    image: postgres:latest
+    networks:
+      - mynetwork
+volumes:
+  myvolume:
+networks:
+  mynetwork:
+```
+
+Here, the environment variables `NODE_ENV` and `PORT` are defined for the `web` service. We are using the `environment` key to define environment variables.
+Also not we are directly defining the environment variables. We are not using a `.env` file.
+
+### Use .env file
+
+You can also use a `.env` file to define environment variables. Here is an example of a `.env` file:
+
+```yaml
+NODE_ENV=development
+PORT=3000
+```
+
+Here, the environment variables `NODE_ENV` and `PORT` are defined. You can use the `env_file` key to specify a file from which to read environment variables.
+
+- Here is an example of a service that uses environment variables from a `.env` file:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+    env_file:
+      - .env
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+    networks:
+      - mynetwork
+  db:
+    image: postgres:latest
+    networks:
+      - mynetwork
+volumes:
+  myvolume:
+networks:
+  mynetwork:
+```
+
+- Or you can use `${}` to specify a file from which to read environment variables. Here is an example of a service that uses environment variables from a `.env` file:
+
+```yaml
+version: '3'
+services:
+  web:
+    image: myapp:latest
+    ports:
+      - '3000:3000'
+    volumes:
+      - myvolume:/app
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+    env_file:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+  worker:
+    image: myapp:latest
+    volumes:
+      - myvolume:/app
+    networks:
+      - mynetwork
+  db:
+    image: postgres:latest
+    networks:
+      - mynetwork
+volumes:
+  myvolume:
+networks:
+  mynetwork:
+```
+
+> Note: Using a .env is useful for development, but it is not recommended to use it in production. The main usecase is when you push your code to a git repository and you
+> want to keep your environment variables secret. You can use a `.env` file to define environment variables and then add it to your `.gitignore` file.
+
+## Other keys and configuration options
+
+Other widely used keys are:
+
+- `build`: The `build` key is used to build an image from a Dockerfile. It takes a string with the path to the directory containing the Dockerfile or an object with configuration options.
+- `command`: The `command` key is used to override the default command. It takes a string with the command to run.
+- `container_name`: The `container_name` key is used to specify a custom name for the container. It takes a string with the name of the container.
+- `devices`: The `devices` key is used to add host devices to the container. It takes a list of device paths or an object with configuration options.
+- `entrypoint`: The `entrypoint` key is used to override the default entrypoint. It takes a string with the entrypoint command to run.
+- `env_file`: The `env_file` key is used to specify a file from which to read environment variables. It takes a string with the path to the file.
+- `expose`: The `expose` key is used to expose ports without publishing them to the host machine - they'll only be accessible to linked services.
+  It takes a list of ports or an object with configuration options.
+- `external_links`: The `external_links` key is used to add links to containers started outside this `docker-compose.yml` or even outside of Compose.
+  It takes a list of external links or an object with configuration options.
+- `image`: The `image` key is used to specify the image to start the container from. It takes a string with the name of the image.
+- `links`: The `links` key is used to add links to other services. It takes a list of links or an object with configuration options.
+- `network_mode`: The `network_mode` key is used to set the networking mode for the service. It takes a string with the networking mode.
+- `ports`: The `ports` key is used to publish a container's port(s) to the host. It takes a list of ports or an object with configuration options.
+- `restart`: The `restart` key is used to control when a container should be restarted. It takes a string with the restart policy.
+- `shm_size`: The `shm_size` key is used to set the size of `/dev/shm`. It takes a string with the size of `/dev/shm`.
+- `stdin_open`: The `stdin_open` key is used to keep `STDIN` open even if not attached. It takes a boolean value.
+- `tty`: The `tty` key is used to allocate a pseudo-TTY. It takes a boolean value.
+- `user`: The `user` key is used to set the user name or UID used and optionally the user group or GID for the container process. It takes a string with the user name or UID.
+
+## Commands and flags that you should know about
+
+There are a few commands and flags that you should know about and some that I use on a regular basis.
+
+### Docker commands
+
+- `docker ps`: This command is used to list the running containers.
+- `docker ps -a`: This command is used to list all the containers.
+- `docker images`: This command is used to list the images.
+- `docker build`: This command is used to build an image from a Dockerfile.
+- `docker run -i -t -d -p 3000:3000 -v $(pwd):/app -w /app --name myapp myapp:latest`: This command is used to run a container.
+  The `-i` flag is used to keep `STDIN` open even if not attached. The `-t` flag is used to allocate a pseudo-TTY.
+  The `-d` flag is used to run the container in the background. The `-p` flag is used to publish a container's port(s) to the host.
+  The `-v` flag is used to mount a volume. The `-w` flag is used to set the working directory. The `--name` flag is used to set the name of the container.
+- `docker logs`: This command is used to view the logs of a container.
+- `docker exec`: This command is used to execute a command in a running container.
+  - `docker exec -it <container_id> bash`: This command is used to open a bash shell in a container.
+- `docker restart`: This command is used to restart a container.
+- `docker stop`: This command is used to stop a container.
+- `docker start`: This command is used to start a container.
+  The `myapp:latest` argument is used to specify the image to start the container from.
+- `docker pull`: This command is used to pull an image.
+- `docker push`: This command is used to push an image.
+- `docker inspect`: This command is used to inspect a container. It takes a container name or ID as an argument.
+- `docker rm`: This command is used to remove a container. It takes a container name or ID as an argument.
+- `docker rmi`: This command is used to remove an image. It takes an image name or ID as an argument.
+- `docker container ls`: This command is used to list the running containers.
+
+### Docker Compose commands
+
+- `docker-compose up -d --build`: This command is used to start the services. The `-d` flag is used to run the services in the background. The `--build` flag is used to build the images before starting the services.
+- `docker-compose down`: This command is used to stop the services and remove the containers.
+- `docker-compose ps`: This command is used to list the services.
+- `docker-compose logs`: This command is used to view the logs of the services.
+- `docker-compose exec`: This command is used to execute a command in a running container.
+  - `docker-compose exec web bash`: This command is used to open a bash shell in the `web` service.
+- `docker-compose restart`: This command is used to restart the services.
+- `docker-compose stop`: This command is used to stop the services.
+- `docker-compose start`: This command is used to start the services.
+- `docker-compose build`: This command is used to build the images.
+- `docker-compose pull`: This command is used to pull the images.
+- `docker-compose push`: This command is used to push the images.
+- `docker-compose inspect`: This command is used to inspect the services. It takes a service name as an argument.
+
+### Some cool commands with it's flags
+
+- `docker-compose up -d --build --scale worker=3`: This command is used to start the services. The `-d` flag is used to run the services in the background. The `--build` flag is used to build the images before starting the services.
+  The `--scale` flag is used to scale the services. In this case, the `worker` service will be scaled to 3 instances.
+
+- `docker-compose exec -T <CLI command>`: This command is used to execute a command in a running container. The `-T` flag is used to disable pseudo-tty allocation.
+  This is useful for commands that don't require a TTY. A TTY is a virtual terminal that allows you to interact with a running process in a container.
+
+- `docker system prune -a`: This command is used to remove all unused containers, networks, images (both dangling and unreferenced), and optionally, volumes.
+
+- `docker system df -v`: This command is used to show docker disk usage. The `-v` flag is used to show volume disk usage. It's useful
+  to see how much space is being used by the volumes.
+
+> Pro Tip => To clear out all unused images (both dangling and unreferenced), run `docker system prune -a`.
+
+## Conclusion
+
+In this article, we learned about Docker Compose and how to use it to manage multiple containers. We also learned about the `docker-compose.yml` file and the keys that it contains.
+We also learned about some commands and flags that we can use with Docker Compose. I hope you enjoyed this article and learned something new. If you have any questions,
+feel free to ask them through my socials or email. I'll be happy to answer them.

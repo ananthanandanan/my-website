@@ -1,0 +1,173 @@
+---
+title: Handling JWT-Protected Routes in React with Axios Interceptors
+date: '2023-01-15'
+tags: ['React', 'Basics', 'JWT']
+draft: false
+summary: Learn how to create a reusable React hook that handles JWT-protected routes with axios interceptors, making it easy to maintain and troubleshoot while allowing easy access to protected routes without adding logic for token expiration and refreshing manually.
+images: []
+layout: PostLayout
+canonicalUrl: react-axios-jwt
+authors: ['default']
+---
+
+In the previous post, we covered how to setup Node project, create expressJS routes for connecting to a MongoDB database and how to create protected routes
+that use JSON Web Tokens (JWT) for authentication. In this post, we will take a look at how to use a wrapper on top of the popular axios
+library to easily use these JWT-protected routes in your React application. If you haven't read the previous post, I recommend you do so before
+reading this one.
+
+## Challenge with JWT-Protected Routes
+
+One of the challenges of using JWT-protected routes is that the token expires after a certain period of time. This means that your application
+will need to handle refreshing the token when it expires, in order to continue accessing protected routes. One way to do this is to create a
+`hook` that will use refresh token from client cookie to get a new access token. This is a good solution, but it requires a lot
+of manual work to implement and maintain. Another way is to use axios interceptors to automatically refresh the token before the request is sent.
+This is the approach we will take in this post.
+
+## Axios Interceptors
+
+Axios interceptors are functions that are called before a request is sent and before a response is received. They are useful for adding
+headers to requests, handling errors, and refreshing tokens.
+
+## Creating the Axios Wrapper
+
+We will first create two different axios instances, one for the protected routes and one for the unprotected routes. We will then create a
+wrapper that will use the protected axios instance to make requests to protected routes. This wrapper will also handle refreshing the token
+before the request is sent if the token has expired.
+
+The axios instances for protected and unprotected routes will be created in a separate file called `api\axios.js`. The protected axios
+instance will have the `withCredentials` option set to true, which will allow the client to send cookies to the server.
+
+```js
+import axios from 'axios'
+
+const BACKEND_URL = process.env.REACT_APP_API_URL
+export default axios.create({
+  baseURL: BACKEND_URL,
+})
+
+export const axiosSecure = axios.create({
+  baseURL: BACKEND_URL,
+  withCredentials: true,
+})
+```
+
+## Creating the useRefreshToken Hook
+
+The `useRefreshToken` hook will be used to refresh the token when it expires. It will take the refresh token from the client cookie and use it
+to get a new access token. It will then store the new access token in the client cookie or if you are using a state management library like
+`Redux`, you can store it there and it returns the new access token as well. We will create a separate file called `hooks\useRefreshToken.js` to
+store this hook.
+
+```js
+import { useContext } from 'react'
+import AuthContext from '../store/auth-context'
+import axios from '../api/axios'
+
+const useRefreshToken = () => {
+  const authctx = useContext(AuthContext)
+
+  const refresh = async () => {
+    const res = await axios.get('/api/refresh', {
+      withCredentials: true,
+    })
+    //Change current state of user
+    authctx.setToken(res.data.accessToken)
+
+    return res.data.accessToken
+  }
+  return refresh
+}
+
+export default useRefreshToken
+```
+
+## Creating the Axios Wrapper with Interceptors
+
+Now that we have the `useRefreshToken` hook, we can create the axios wrapper. We will create a separate file called `hooks\useAxiosSecure.js` to
+store this hook. This hook will use the `useRefreshToken` hook to refresh the token before the request is sent if the access token has expired. It will
+send back data from the response if the request is successful.
+
+```js
+const useAxiosSecure = () => {
+  const authCtx = useContext(AuthContext)
+  const refresh = useRefreshToken()
+
+  useEffect(() => {
+    const requestIntercept = axiosSecure.interceptors.request.use(
+      (config) => {
+        if (!config.headers['Authorization']) {
+          config.headers['Authorization'] = `Bearer ${authCtx.accessToken}`
+        }
+        return config
+      },
+      (err) => Promise.reject(err)
+    )
+    const responseIntercept = axiosSecure.interceptors.response.use(
+      (response) => response, // if response is 200
+      async (err) => {
+        // if there is some error
+        const sentRequest = err?.config
+        if (err?.response?.status === 403 && !sentRequest?.sent) {
+          sentRequest.sent = true
+          const newAccessToken = await refresh()
+          sentRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
+          return axiosSecure(sentRequest)
+        }
+        return Promise.reject(err)
+      }
+    )
+
+    return () => {
+      axiosSecure.interceptors.response.eject(responseIntercept)
+      axiosSecure.interceptors.request.eject(requestIntercept)
+    }
+  }, [authCtx, refresh])
+  return axiosSecure
+}
+
+export default useAxiosSecure
+```
+
+### Explanation
+
+The axios wrapper uses the `useRefreshToken` hook to refresh the token before the request is sent. It also uses the `useEffect` hook to add
+interceptors to the axios instance. The request interceptor adds the access token to the request header if it is not already present. The
+response interceptor checks if the response status is 403, which means that the token has expired. If the token has expired, it will call the
+`useRefreshToken` hook to refresh the token and then resend the request with the new access token. The `sentRequest` variable is used to make
+sure that the request is not sent again if the token has expired.
+
+> Note => `return` method in `useEffect` is used to remove the interceptors when the component unmounts. This is important because if you don't
+> remove the interceptors, they will be called every time the component renders, which will cause an infinite loop.
+
+## Using the Axios Wrapper
+
+Now that we have the axios wrapper, we can use it to make requests to protected routes. We will create a separate file called `api\api.js` to
+store the axios wrapper. We will also create a separate file called `api\apiRoutes.js` to store the routes for the API.
+
+```js
+import axiosSecure from './useAxiosSecure'
+
+const axiosSecure = useAxiosSecure()
+
+let removeCardRes = await axiosSecure.delete('api/list/delete_list/' + tasksId + '/' + boardId)
+```
+
+It's that simple! Now you can use the axios wrapper to make requests to protected routes. You can also use the axios wrapper to make requests
+to unprotected routes.
+
+## Conclusion
+
+In this post, we learned how to use axios interceptors to automatically refresh the token before the request is sent. We also learned how to
+create a custom hook to refresh the token. We then created an axios wrapper that uses the custom hook to refresh the token before the request is
+sent. We also learned how to use the axios wrapper to make requests to protected routes. You can find the code for this post on
+[GitHub](https://github.com/Akshay3960/lazzzy-space/tree/master/frontend).
+
+## Resources
+
+- [Axios Interceptors](https://axios-http.com/docs/interceptors)
+- [Axios Documentation](https://axios-http.com/docs/intro)
+- [React Context](https://reactjs.org/docs/context.html)
+- [React Hooks](https://reactjs.org/docs/hooks-intro.html)
+- [React Custom Hooks](https://reactjs.org/docs/hooks-custom.html)
+- [React useEffect](https://reactjs.org/docs/hooks-effect.html)
+- [React useContext](https://reactjs.org/docs/hooks-reference.html#usecontext)

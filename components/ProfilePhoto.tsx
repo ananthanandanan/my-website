@@ -7,7 +7,7 @@ type ProfilePhotoProps = Readonly<{
 
 export function ProfilePhoto({ src, alt }: ProfilePhotoProps) {
   return (
-    <div className="group relative mt-[2px] h-[210px] w-[160px] shrink-0">
+    <div className="group relative mt-[2px] h-[210px] w-[160px] shrink-0 rounded-[4px]">
       <Image
         src={src}
         alt={alt}
@@ -17,7 +17,7 @@ export function ProfilePhoto({ src, alt }: ProfilePhotoProps) {
       />
 
       <div
-        className="pointer-events-none absolute -inset-px z-1 rounded-[5px]"
+        className="pointer-events-none absolute -inset-px z-1 rounded-[4px]"
         style={{
           boxShadow: "0 0 0 1px #1e2229, 0 8px 32px rgba(74,158,255,0.08)",
         }}
@@ -34,13 +34,31 @@ export function ProfilePhoto({ src, alt }: ProfilePhotoProps) {
       />
 
       <div
-        className="pointer-events-none absolute -top-3px -left-3px z-3 h-12px w-12px border-solid opacity-65"
-        style={{ borderColor: "#4a9eff", borderWidth: "1.5px 0 0 1.5px" }}
+        className="pointer-events-none absolute"
+        style={{
+          top: "-3px",
+          left: "-3px",
+          width: "12px",
+          height: "12px",
+          borderTop: "1.5px solid #4a9eff",
+          borderLeft: "1.5px solid #4a9eff",
+          opacity: 0.65,
+          zIndex: 3,
+        }}
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-3px -bottom-3px z-3 h-12px w-12px border-solid opacity-65"
-        style={{ borderColor: "#4a9eff", borderWidth: "0 1.5px 1.5px 0" }}
+        className="pointer-events-none absolute"
+        style={{
+          bottom: "-3px",
+          right: "-3px",
+          width: "12px",
+          height: "12px",
+          borderBottom: "1.5px solid #4a9eff",
+          borderRight: "1.5px solid #4a9eff",
+          opacity: 0.65,
+          zIndex: 3,
+        }}
         aria-hidden
       />
     </div>

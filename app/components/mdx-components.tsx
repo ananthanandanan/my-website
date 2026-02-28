@@ -7,6 +7,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import { ProseList } from "@/components/ProseList";
 import { CodeBlock } from "./CodeBlock";
 import { DefinitionList, type DefinitionItem } from "./DefinitionList";
 import { NumberedSteps, type NumberedStepItem } from "./NumberedSteps";
@@ -217,16 +218,16 @@ function parseNumberedStep(node: LiElement): NumberedStepItem | null {
 function MdxUl(props: ComponentPropsWithoutRef<"ul">) {
   const items = Children.toArray(props.children).filter((child) => !isWhitespaceText(child));
   if (items.length === 0) {
-    return <ul {...props} />;
+    return <ProseList {...props} />;
   }
 
   if (!items.every((item) => isLiElement(item))) {
-    return <ul {...props} />;
+    return <ProseList {...props} />;
   }
 
   const parsedItems = items.map((item) => parseDefinitionItem(item));
   if (parsedItems.some((item) => item === null)) {
-    return <ul {...props} />;
+    return <ProseList {...props} />;
   }
 
   return <DefinitionList items={parsedItems as DefinitionItem[]} />;

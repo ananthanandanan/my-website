@@ -1,0 +1,517 @@
+---
+title: Setup a basic Django-GraphQL framework project
+date: '2023-01-11'
+tags: ['Django', 'GraphQL', 'Python', 'API', 'Basics']
+draft: false
+summary: A step by step walkthrough on setting up django graphql framework and some easy principles to follow.
+images: []
+layout: PostLayout
+canonicalUrl: dj-graphql-basics
+authors: ['default']
+---
+
+# What is Django and GraphQL?
+
+Django is a powerful web framework for building web applications using the Python programming language.
+GraphQL is a query language for your API that allows clients to request exactly the data they need,
+making it a great choice for building a flexible and efficient backend for your project.
+In this post, we'll walk through the steps of setting up a Django-GraphQL backend for your
+project.
+
+## Prerequisites
+
+Before getting started, you'll need to have the following installed on your machine:
+
+- Python 3
+- pip (the package manager for Python)
+- virtualenv (to create a isolated Python environment for your project)
+
+## Step 1: Create a Virtual Environment
+
+The first step is to create a virtual environment for your project. This will allow you to keep
+your project's dependencies separate from the global Python environment, making it easier to manage
+and deploy.
+
+To create a virtual environment, open a terminal and navigate to the directory where you want to create your project.
+Then run the following command:
+
+```bash
+virtualenv venv
+```
+
+This will create a new directory called `myenv` in your current directory, which will contain the isolated Python
+environment for your project. To activate the environment, run the following command:
+
+```bash
+source venv/bin/activate
+```
+
+Your terminal prompt should now be prefixed with the name of your environment (e.g., "(myenv) $").
+
+## Step 2: Install Django and Graphene
+
+With your virtual environment active, you can now install the required packages for your project.
+To install Django and graphql and graphql-jwt and run the following command:
+
+```bash
+pip install django graphene-django graphql-jwt
+```
+
+## Step 3: Create a Django Project
+
+With Django installed, you can now create a new project. In your terminal, navigate to the
+directory where you want to create your project and run the following command:
+
+```bash
+django-admin startproject framework
+```
+
+This will create a new directory called `framework` in your current directory,
+which will contain the files for your Django project.
+
+## Step 4: Create a Django App
+
+With your Django project created, you can now create a new app to contain your
+GraphQL functionality. Each app will be a module which consist of specific functionality.
+We are splitting up the project into different app module for the each of development and
+maintaining a clean codebase.
+
+For e.g; let the first app module that of `user`. In your terminal, navigate to the directory of your project
+and run the following command:
+
+```bash
+python manage.py startapp user
+```
+
+This will create a new directory called `user` in your current directory,
+
+## Step 5: Configure Django Settings
+
+With your app created, you can now configure your Django settings. Open the `framework/settings.py` file in your
+project and add the following lines to the end of the file:
+
+```python
+INSTALLED_APPS = [
+    ...
+    'graphene_django',
+    'user',
+]
+```
+
+This will add the `graphene_django` and `user` apps to your project.
+
+## Step 6: Create a GraphQL Schema
+
+From the projects that I have worked with Django and GraphQL, I have found that the best way is to create a
+root schema.py in project directory i.e; `framework` directory. This will contain all the schema for the
+different app modules, including the Query and Mutation classes. This provides an easy management of the
+schema, and grapql APIs for the project.
+
+In the `framework\schema.py` file, add the following:
+
+```python
+import graphene
+import graphql_jwt
+from user.graphql.query import UserQuery
+from user.graphql.mutations import Mutation as UserMutation
+
+
+class Query(UserQuery, graphene.ObjectType):
+    pass
+
+
+class Mutation(UserMutation,
+               graphene.ObjectType):
+    token_auth = graphql_jwt.ObtainJSONWebToken.Field()
+    verify_token = graphql_jwt.Verify.Field()
+    refresh_token = graphql_jwt.Refresh.Field()
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
+```
+
+Now in the `framework\settings.py` file, add the following lines to the end of the file:
+
+```python
+GRAPHENE = {
+    'SCHEMA': 'framework.schema.schema',
+    'MIDDLEWARE': [
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    ],
+}
+```
+
+Now you might be wondering what is Query and Mutation and how are they used. Well, Query is used to fetch
+data from the database and Mutation is used to create, update and delete data from the database.
+In the above code, we have imported the Query and Mutation classes from the `user` app module.
+We have also imported the `graphql_jwt` package, which will allow us to use JSON Web Tokens for authentication.
+We will understand about how to create Query and Mutation in the next steps.
+
+## Step 7: GraphQL Endpoint
+
+Now that we have created a GraphQL schema, we can create a GraphQL endpoint to access it.
+In the `framework\urls.py` file, add the following lines to the end of the file:
+
+```python
+from django.contrib import admin
+from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
+from graphene_django.views import GraphQLView
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
+]
+```
+
+This will add a GraphQL endpoint to your project at `http://localhost:8000/graphql`.
+
+## Step 8: Create a GraphQL Query
+
+I have come to follow a principle of creating `4` folders for an app module under `graphql` directory to
+create the API endpoints. They are:
+
+- `inputs` - This folder will contain the input classes for the mutations.
+- `mutations` - This folder will contain the mutation classes.
+- `query` - This folder will contain the query classes.
+- `types` - This folder will contain the type classes.
+
+> HACK => Each of the above folders will contain a `__init__.py` file, which will contain the imports for the classes.
+
+- This again, helps to manage the codebase and also helps to understand the codebase easily.
+
+Now that we have created a GraphQL endpoint, we can create a GraphQL query to access it. Before that we have to create
+user model. In the `user\models.py` file, add the following lines to the end of the file:
+
+```python
+from django.db import models
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    id = models.BigAutoField(primary_key=True, null=False)
+    email = models.EmailField(unique=True, null=False, blank=False)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    first_name = models.CharField(max_length=255, default='', blank=True, verbose_name='First Name')
+    last_name = models.CharField(max_length=255, default='', blank=True, verbose_name='Last Name')
+
+```
+
+You can add more fields to the user model as per your requirement. Since this will be the new `User` model, which would
+rewrite the existing django backend `User` we need to specify it in settings.py. In the `framework\settings.py` file,
+add the following lines to the end of the file:
+
+```python
+AUTH_USER_MODEL = 'user.User'
+```
+
+- After that register the `User` model in `user\admin.py` file.
+
+```python
+from django.contrib import admin
+from .models import User
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    ##show how each object will be listed
+    list_display = ['username', 'date_joined']
+    ##show filters
+    list_filter = [
+        'is_active', 'is_staff', 'gender', 'date_joined'
+    ]
+    ##seach fields
+    search_fields = ['username', 'first_name', 'last_name', 'email']
+```
+
+Now we can create a GraphQL query to access the user model. In the `user\graphql\query\users.py` file,
+add the following lines to the end of the file:
+
+```python
+import graphene
+from user.models import User
+from user.graphql.types import UserBasicObj
+
+class UserQuery(graphene.ObjectType):
+    users = graphene.List(UserBasicObj)
+
+    def resolve_users(self, info):
+        return User.objects.all()
+```
+
+### Explanation
+
+- `UserQuery` is a class which inherits from `graphene.ObjectType`. This is a class which is used to create a GraphQL query.
+- `users` is a field which is of type `graphene.List(UserBasicObj)`. This field will return a list of `UserBasicObj` type.
+- `resolve_users` is a method which is used to resolve the `users` field. This method will return all the users from the database.
+  `resolvers` are used to resolve the fields in a GraphQL query.
+- `graphene.List` is a class which is used to create a list of a particular type.
+
+> HACK => You can also create a query to fetch a single user by specifying the `id` of the user.
+
+```python
+import graphene
+from user.models import User
+from user.graphql.types import UserBasicObj
+
+class UserQuery(graphene.ObjectType):
+    users = graphene.List(UserBasicObj)
+    user = graphene.Field(UserBasicObj, id=graphene.ID())
+
+    def resolve_users(self, info):
+        return User.objects.all()
+
+    def resolve_user(self, info, **kwargs):
+        id = kwargs.get('id')
+        return User.objects.get(id=id)
+```
+
+> NOTE:
+> graphene is a python library which is used to create GraphQL schemas. There are different types of fields which can be
+> created in a GraphQL schema. They are: `graphene.Field`, `graphene.List`, `graphene.NonNull`, `graphene.String`,
+> `graphene.Int`, `graphene.Boolean`, `graphene.Float`, `graphene.ID`, `graphene.DateTime`, `graphene.Decimal` etc.
+> According to the requirement of the model structure, you can use any of the above fields to create a GraphQL schema.
+> In this case, we needed to create a list of users, so we used `graphene.List` field. If we needed to create a single
+> user, we would have used `graphene.Field` field.
+
+We have to also create a GraphQL type for the user model. In the `user\graphql\types\users.py` file,
+add the following lines to the end of the file:
+
+```python
+import graphene
+from user.models import User
+
+class UserBasicObj(
+    graphene.ObjectType,
+    description='the user type'
+):
+    id = graphene.ID()
+    firstName = graphene.String()
+    lastName = graphene.String()
+    email = graphene.String()
+
+    def resolve_id(self, info):
+        if isinstance(self, User):
+            return self.id
+
+    def resolve_firstName(self, info):
+        if isinstance(self, User):
+            return self.first_name
+
+    def resolve_lastName(self, info):
+        if isinstance(self, User):
+            return self.last_name
+
+    def resolve_email(self, info):
+        if isinstance(self, User):
+            return self.email
+
+```
+
+Now we can access the user model using the GraphQL query. Open the GraphQL
+endpoint at `http://localhost:8000/graphql` and run the following query:
+
+```graphql
+query {
+  users {
+    id
+    firstName
+    lastName
+    email
+  }
+}
+```
+
+- Let's check a sample input of the above query:
+
+```json
+{
+  "data": {
+    "users": [
+      {
+        "id": "1",
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "test@gmail.com"
+      }
+    ]
+  }
+}
+```
+
+PRO TIP => If the query or mutation classes get too big, you can split them
+into multiple files and import them in the `__init__.py` file. For example in
+the `user\graphql\query.py` file, add the following lines to the end of the
+`user\graphql\query\__init__.py` file:
+
+```python
+from .user import UserQuery
+
+__all__ = [
+    'UserQuery',
+    ## add more queries here
+]
+
+```
+
+## Step 9: Create a GraphQL Mutation
+
+### Create input structure for user creation
+
+Now we can create a GraphQL mutation to create a user. In the `user\graphql\inputs\users.py` file,
+add the following lines to the end of the file:
+
+```python
+import graphene
+from graphene_django import DjangoObjectType
+from user.models import User
+
+class UserCreateInput(graphene.InputObjectType):
+    username = graphene.String(required=True)
+    email = graphene.String(required=True)
+    password = graphene.String(required=True)
+    firstName = graphene.String(required=True)
+    lastName = graphene.String(required=True)
+```
+
+### Create user creation class
+
+Now we can create a GraphQL mutation to create a user. In the `user\graphql\mutations\users.py` file,
+add the following lines to the end of the file:
+
+```python
+import graphene
+from user.models import User
+from user.graphql.inputs import UserCreateInput
+from user.graphql.types import UserBasicObj
+
+class UserCreationResponse(graphene.ObjectType):
+    success = graphene.Boolean()
+    returning = graphene.Field(UserBasicObj)
+
+
+class CreateUser(graphene.Mutation,
+                 description='create a user'):
+    class Arguments:
+        inputs = graphene.Argument(userCreationInput,
+                                   required=True,
+                                   description='inputs available for creation')
+        password = graphene.String(required=True)
+        username = graphene.String(required=True)
+
+    Output = UserCreationResponse
+
+    def mutate(self, info, inputs: userCreationInput, password, username):
+        user = User.objects.create(
+            username=input.username,
+            email=input.email,
+            first_name=input.firstName,
+            last_name=input.lastName,
+        )
+        user.set_password(input.password)
+        user.save()
+        return UserCreationResponse(success=True, returning=user)
+```
+
+I have come to follow the convention of returning a response object with a certain structure. here the structure
+is as follows:
+
+```python
+class UserCreationResponse(graphene.ObjectType):
+    success = graphene.Boolean()
+    returning = graphene.Field(UserBasicObj)
+```
+
+The `success` field will be `True` if the mutation was successful and `False` otherwise. The `returning` field will
+contain the object that was created. In this case, it will be the user object. This will be useful when we want to
+return the newly created object in the response. Which will be more useful in the frontend as well as graphql playground,
+wheich would provide us with a well-structured response. Which could then be destructured as per the need.
+
+### Register the mutation
+
+Now we can register the mutation in the `user\graphql\mutations\__init__.py` file, add the following lines to the end of the file:
+
+```python
+from .user import CreateUser
+
+class Mutation(graphene.ObjectType):
+    createUser = CreateUser.Field()
+    ## add more mutations here
+
+__all__ = [
+    'Mutation',
+]
+```
+
+Here we have registered the mutation and also added it to the `__all__` list. This will make it easier to import the mutation.
+
+### Create a GraphQL mutation
+
+Now we can access the user model using the GraphQL mutation. Open the GraphQL
+endpoint at `http://localhost:8000/graphql` and run the following mutation:
+
+```graphql
+mutation {
+  createUser(
+    inputs: {
+      username: "testuser"
+      email: "hello@gmail.com"
+      password: "testpassword"
+      firstName: "test"
+      lastName: "user"
+    }
+  ) {
+    success
+    returning {
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+}
+```
+
+- This will create a user with the given details and return the newly created user object with the `success` field set to `True`. The
+  sample Output with look like:
+
+```json
+{
+  "data": {
+    "createUser": {
+      "success": true,
+      "returning": {
+        "id": "1",
+        "firstName": "test",
+        "lastName": "user",
+        "email": "hello@gmail.com"
+      }
+    }
+  }
+}
+```
+
+- If the mutation fails, the `success` field will be set to `False` and the `returning` field will be `null`. The sample output will look like:
+
+```json
+{
+  "data": {
+    "createUser": {
+      "success": false,
+      "returning": null
+    }
+  }
+}
+```
+
+## To Sum up
+
+In this post, we have learned how to setup a base django-graphql backend framework project to build GraphQL API endpoints. we have learned how to create a
+GraphQL API using Django and graphene. We have also learned how to create a GraphQL query and mutation. We have also learned how to create a GraphQL input object and how to use it in the mutation.
+We have also learned how to create a GraphQL response object and how to use it in the mutation and certain principles to follow will be useful while developing
+the GraphQL APIs. From this base setup and principles we can build robust GraphQL APIs for our frontend applications like React, Vue, Angular, NextJS, etc.
+
+## References
+
+- [Graphene](https://docs.graphene-python.org/en/latest/)
+- [Graphene Django](https://docs.graphene-python.org/projects/django/en/latest/)
+- [Django](https://docs.djangoproject.com/en/3.1/)
+- [CMS](https://gitlab.com/amfoss/amfoss/cms)

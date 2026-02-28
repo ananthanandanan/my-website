@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { ProseList } from "@/components/ProseList";
+import { TaskList } from "@/components/TaskList";
 import { CodeBlock } from "./CodeBlock";
 import { DefinitionList, type DefinitionItem } from "./DefinitionList";
 import { NumberedSteps, type NumberedStepItem } from "./NumberedSteps";
@@ -223,6 +224,19 @@ function MdxUl(props: ComponentPropsWithoutRef<"ul">) {
 
   if (!items.every((item) => isLiElement(item))) {
     return <ProseList {...props} />;
+  }
+
+  const hasTaskItems = items.some(
+    (item) =>
+      isLiElement(item) &&
+      Children.toArray(item.props.children).some(
+        (child) =>
+          isValidElement(child) &&
+          (child as ReactElement<{ type?: string }>).props.type === "checkbox",
+      ),
+  );
+  if (hasTaskItems) {
+    return <TaskList {...props} />;
   }
 
   const parsedItems = items.map((item) => parseDefinitionItem(item));

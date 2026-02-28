@@ -1,4 +1,5 @@
 import { siteMetadata } from "@/lib/siteMetadata";
+import { ProfilePhoto } from "@/components/ProfilePhoto";
 
 const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 
@@ -67,24 +68,35 @@ export default function AboutPage() {
     <div className={WRAP}>
       <header className="pt-16">
         <div
-          className="type-eyebrow mb-3 flex items-center gap-3 text-accent"
-          style={{ letterSpacing: "0.2em" }}
+          className="grid items-start gap-7"
+          style={{ gridTemplateColumns: "1fr 160px" }}
         >
-          <span
-            className="inline-block h-px w-5 bg-accent opacity-60"
-            aria-hidden
-          />
-          About
-        </div>
-        <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.6vw,2.35rem)] leading-[1.2] font-bold text-warm">
-          K N Anantha Nandanan
-        </h1>
-        <p className="type-meta mt-2 uppercase tracking-[0.14em] text-text-dim">
-          Backend Engineer · Kerala, India
-        </p>
-        <div className="type-meta mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 uppercase tracking-[0.12em] text-[#7bdc9f]">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#2ecc71]" aria-hidden />
-          Open to opportunities
+          <div>
+            <div
+              className="type-eyebrow mb-3 flex items-center gap-3 text-accent"
+              style={{ letterSpacing: "0.2em" }}
+            >
+              <span
+                className="inline-block h-px w-5 bg-accent opacity-60"
+                aria-hidden
+              />
+              About
+            </div>
+            <h1 className="font-(family-name:--font-libre-baskerville) text-[clamp(2rem,3.6vw,2.35rem)] leading-[1.2] font-bold text-warm">
+              K N Anantha Nandanan
+            </h1>
+            <p className="type-meta mt-2 uppercase tracking-[0.14em] text-text-dim">
+              Backend Engineer · Kerala, India
+            </p>
+            <div className="type-meta mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 uppercase tracking-[0.12em] text-[#7bdc9f]">
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-[#2ecc71]"
+                aria-hidden
+              />
+              Open to opportunities
+            </div>
+          </div>
+          <ProfilePhoto src="/images/profile.JPG" alt="K N Anantha Nandanan" />
         </div>
       </header>
 

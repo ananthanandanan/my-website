@@ -34,6 +34,22 @@ Use normal bullets for regular content that should not render as a definition li
 
 Avoid starting normal bullets with `` `KEY`: ``.
 
+## Checklist format (custom task list style)
+
+Use GitHub task list syntax when you want the checklist UI:
+
+```mdx
+- [ ] Set up a VPS
+- [ ] Set up a domain name
+- [ ] Configure DNS records
+```
+
+Rules:
+
+- Keep the checkbox marker exactly as `- [ ]` (unchecked only).
+- Do not mix checklist items with definition list items in the same list.
+- Checklist checkboxes are decorative in the site UI (no interaction, no checked state).
+
 ## Numbered steps format (custom styled)
 
 Use ordered lists for procedural content:

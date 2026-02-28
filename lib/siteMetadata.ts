@@ -5,14 +5,14 @@ export const siteMetadata = {
   description:
     "Software engineer focused on scalable backend systems, DevOps, and applied AI. Writing about things I learn and systems I build.",
   language: "en-US",
-  siteUrl: "https://ankanandanan.com",
-  siteRepo: "https://github.com/ankanandanan/my-website",
+  siteUrl: "https://ananthanandanan.com",
+  siteRepo: "https://github.com/ananthanandanan/my-website",
   locale: "en-US",
   social: [
-    { name: "GitHub", href: "https://github.com/ankanandanan", icon: "github" },
-    { name: "LinkedIn", href: "https://linkedin.com/in/ankanandanan", icon: "linkedin" },
-    { name: "Twitter", href: "https://x.com/ankanandanan", icon: "twitter" },
-    { name: "Email", href: "mailto:hello@example.com", icon: "email" },
+    { name: "GitHub", href: "https://github.com/ananthanandanan", icon: "github" },
+    { name: "LinkedIn", href: "https://www.linkedin.com/in/de-blank", icon: "linkedin" },
+    { name: "Twitter", href: "https://x.com/Ananthan2k", icon: "twitter" },
+    { name: "Email", href: "mailto:ananthanandanan@gmail.com", icon: "email" },
   ],
   analytics: {
     enabled: false,

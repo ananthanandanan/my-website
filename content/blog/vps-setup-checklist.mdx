@@ -1,0 +1,181 @@
+---
+title: VPS Setup Checklist
+date: '2025-12-28'
+tags: ['basics', 'linux', 'setup', 'self-host']
+draft: false
+summary: This is a blog on the general checklist that I have come to follow while setting up a VPS
+images: []
+layout: PostLayout
+canonicalUrl: vps-setup
+authors: ['default']
+---
+
+# 🚀 VPS Setup Checklist
+
+In this blog, I want to share the checklist that I have come to follow while setting up a VPS. This is not going to be a comprehensive guide, because I feel that there are certain things or style that is specific to the individual and their needs. And I think everyone would agree that most often than not, you would forget certain steps and you have to go back and forth to remember what you did. It's a pain, so I made my own checklist. This would kind of serve as a reference for me to remember what I did and what I need to do. So let's get started! 📝
+
+---
+
+## 📋 Prerequisites
+
+Before we begin, make sure you have:
+
+- A VPS (Hetzner, DigitalOcean, Linode, etc.) 🖥️
+- A domain name (Cloudflare, etc.) 🌐
+- A basic understanding of Linux 🐧
+- A basic understanding of SSH 🔐
+- A basic understanding of the command line 💻
+
+---
+
+## ✅ Quick Checklist
+
+Here's the high-level checklist we'll be covering:
+
+- [ ] Set up a VPS
+- [ ] Set up a domain name
+- [ ] Configure DNS records
+- [ ] Set up Docker and Docker Compose
+- [ ] Configure firewall
+- [ ] Set up Coolify (or alternative)
+
+---
+
+## 🖥️ Set up a VPS
+
+### Choosing a VPS Provider
+
+I would say that [Hetzner](https://www.hetzner.com/) is one of the best VPS providers out there. There are other good providers like [DigitalOcean](https://www.digitalocean.com/), [Linode](https://www.linode.com/), etc. But I have personally used Hetzner and I have been happy with their service. 💯
+
+### Creating an Instance
+
+After you sign up to the VPS provider of your choice, you need to create a new instance. I have always chosen Ubuntu as the operating system. Go with the suitable resource allocation for your needs.
+
+Once the instance is created, you'll get root access. Using SSH, you can connect to the instance:
+
+```bash
+ssh root@your-server-ip
+```
+
+Now you're connected to the instance! Let's move on to the next steps. 🎯
+
+---
+
+## 🌐 Set up a Domain Name
+
+Now, you need to set up a domain name. I already have a domain name with [Porkbun](https://porkbun.com/). I like their service and they are very affordable. As for management, I use [Cloudflare](https://www.cloudflare.com/) to manage my domain name. So I update the nameservers to the ones provided by Cloudflare. We will get to DNS records later. 📍
+
+---
+
+## 🐳 Setting up Docker and Docker Compose
+
+What's the most important thing to setup first? Docker and Docker Compose. For me, this is de facto my first thing to setup. I use Docker to containerize my applications. This is a great way to deploy my applications and it is very easy to manage.
+
+### Installing Docker and Docker Compose
+
+Since we are using Ubuntu, we can use the `apt` repository way to install Docker and Docker Compose. The [Docker Docs](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) has the detailed instructions.
+
+### 🎯 Docker Context (Pro Tip)
+
+There is a thing called `docker context`. It is a way to manage multiple docker hosts when you have multiple machines or you want to switch between them easily. You can create a context for each machine and then switch between them easily.
+
+```bash
+# Create a context for remote Docker host
+docker context create my-context --docker host=ssh://user@host
+
+# Switch to the context
+docker context use my-context
+```
+
+This is super useful when managing multiple servers! 🔄
+
+---
+
+## 🔥 Firewall Configuration
+
+For Ubuntu, you can use `ufw` (Uncomplicated Firewall) to manage the firewall. It is a great tool to manage the firewall. It is very easy to use and it is very powerful.
+
+Here are the ports I typically open:
+
+```bash
+# Allow HTTP and HTTPS
+ufw allow 80/tcp
+ufw allow 443/tcp
+
+# Allow SSH (important!)
+ufw allow 22/tcp
+
+# Allow Coolify dashboard
+ufw allow 8000/tcp
+
+# Allow additional ports if needed (e.g., for specific services)
+ufw allow 6001/tcp
+ufw allow 6002/tcp
+
+# Enable the firewall
+ufw enable
+```
+
+**Note**: Make sure to allow SSH (port 22) before enabling the firewall, or you might lock yourself out! ⚠️
+
+---
+
+## 🚀 Setting up Coolify
+
+[Coolify](https://coolify.io/) is a great self-hosted PaaS that simplifies application deployment. It is a great way to deploy my applications and it is very easy to manage.
+
+This has been my go-to for nearly a year now. Because it is very easy to setup and manage. It allows you to:
+
+- ✅ Deploy and manage your applications
+- ✅ Built-in Traefik as a reverse proxy and Let's Encrypt as an SSL certificate provider. So you can easily setup SSL certificates for your domain.
+- ✅ Easily deploy any kind of services, from a simple web server to a complex application (Docker Compose with many services). Also allows one-click setup for a lot of services like Postgres, MySQL, etc.
+- ✅ Push to Deploy
+- ✅ Automatic backups
+- ✅ Real-time terminal access to your applications
+- ✅ And many more features!
+
+### Installing Coolify
+
+There are a few prerequisites for installing Coolify. It's pretty basic things like making sure you are root user (which we already are), SSH config, and making sure curl is installed.
+
+To install, the only thing you need to run is the following command:
+
+```bash
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+```
+
+Once the installation is complete, you can access the Coolify dashboard at `http://your-server-ip:8000`.
+
+### Configuring Domain for Coolify
+
+Now this is a good time to set up the domain name. I have already set up the domain name with Cloudflare. So I need to add the DNS records to the domain name.
+
+**Step 1**: Point Coolify dashboard to the domain name
+
+- Go to Coolify dashboard → Settings → Domain
+- Add the domain name (e.g., `coolify.yourdomain.com`)
+
+**Step 2**: Add DNS records in Cloudflare
+
+- Add an `A` record with `coolify` as the subdomain and the IP address of the VPS as the value
+
+**Step 3**: Set up wildcard domain (optional but recommended)
+
+- Go to server settings in Coolify and add the wildcard domain (e.g., `yourdomain.com`)
+- In Cloudflare, add an `A` record with name `*` and the IP address of the VPS as the value
+
+And now you can access the Coolify dashboard at `https://coolify.yourdomain.com`! 🎉
+
+---
+
+## 🔧 Alternative: If Not Using Coolify
+
+Well, if you are not using Coolify, going the manual route I would say Docker Stack or Docker Swarm. These are the two most popular ways to deploy applications on a VPS. They have great tooling for production-ready deployments. And you can easily scale your applications. Like providing simple `Blue/Green` deployment strategy, scaling using the docker service scale command, etc.
+
+For more details on manual Docker deployment, you can check out the official [Docker Swarm](https://docs.docker.com/engine/swarm/) or [Docker Stack](https://docs.docker.com/engine/reference/commandline/stack/) documentation.
+
+---
+
+## 🎯 Conclusion
+
+It's pretty simple, but this could work as a foundation for all VPS setup. For instance, Coolify or not, there are other steps for those specific tooling. This checklist serves as a starting point, and you can customize it based on your specific needs. Happy deploying! 🚀

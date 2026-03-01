@@ -1,56 +1,119 @@
-# A.N.K — Personal Website
+# A.N.K - Personal Website
 
-This is my personal website and blog. Built with Next.js (App Router), React, TypeScript, and Tailwind CSS. Features a home page, about, blog (MDX), projects, and tag-based post listing.
+Personal website and blog built with Next.js (App Router), React, TypeScript, and Tailwind CSS v4.
 
 ## Tech Stack
 
 - **Framework:** [Next.js](https://nextjs.org) 16 (App Router)
 - **UI:** React 19, [Tailwind CSS](https://tailwindcss.com) v4
-- **Content:** MDX via `next-mdx-remote`, `gray-matter`, `reading-time`, `rehype-slug`, `rehype-autolink-headings`, `remark-gfm`
-- **Language:** TypeScript
+- **Content pipeline:** MDX via `next-mdx-remote`, `gray-matter`, `reading-time`, `remark-gfm`, `rehype-slug`, `rehype-autolink-headings`, `rehype-pretty-code`
+- **Language:** TypeScript (strict mode)
+
+## Features
+
+- Home, About, Projects, Posts, Tags, and License routes
+- MDX blog with static route generation (`app/blog/[...slug]`)
+- Post list search + tag filtering + pagination (`app/posts/PostsListClient.tsx`)
+- Custom MDX renderers for code blocks, definition lists, numbered steps, and task lists
+- Editorial dark theme with tokenized styles in `app/globals.css`
 
 ## Project Structure
 
-```
+```text
 app/
-  page.tsx              # Home (hero, writing preview, projects preview)
-  layout.tsx            # Root layout, fonts (Libre Baskerville, DM Mono)
-  about/page.tsx        # About page
-  posts/page.tsx       # Blog index
-  blog/[...slug]/      # Individual blog posts (MDX)
-  projects/page.tsx    # Projects list
-  tags/[tag]/page.tsx  # Posts by tag
-  components/          # Nav, Hero, Layout, PostLayout, TOC, etc.
-content/blog/          # MDX blog posts
-lib/                   # blog, mdx, tags, siteMetadata, projectsData, etc.
+  layout.tsx
+  page.tsx
+  globals.css
+  about/page.tsx
+  blog/[...slug]/page.tsx
+  license/page.tsx
+  posts/page.tsx
+  posts/PostsListClient.tsx
+  projects/page.tsx
+  tags/[tag]/page.tsx
+  components/
+    CodeBlock.tsx
+    DefinitionList.tsx
+    Footer.tsx
+    Hero.tsx
+    Horizon.tsx
+    Layout.tsx
+    Nav.tsx
+    NumberedSteps.tsx
+    PostLayout.tsx
+    PostListItem.tsx
+    ProjectCard.tsx
+    ReadProgress.tsx
+    SectionHeader.tsx
+    TOC.tsx
+    Tag.tsx
+    mdx-components.tsx
+
+components/
+  ProfilePhoto.tsx
+  ProseList.tsx
+  TaskList.tsx
+
+content/blog/
+  WRITING_GUIDE.md
+  hacks/
+  language/
+  tutorial/
+  *.mdx
+
+lib/
+  blog.ts
+  formatDate.ts
+  headerNavLinks.ts
+  mdx.ts
+  projectsData.ts
+  siteMetadata.ts
+  tags.ts
+  toc.ts
+
+public/
+  gifs/
+  images/
 ```
 
 ## Getting Started
 
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open `http://localhost:3000`.
 
-### Other scripts
+## Scripts
 
-- `npm run build` — Production build
-- `npm run start` — Start production server
-- `npm run lint` — Run ESLint
+- `npm run dev` - Start development server
+- `npm run build` - Create production build
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npx tsc --noEmit` - Run typecheck
 
-## Adding Blog Posts
+## Writing Blog Posts
 
-Add `.mdx` files under `content/blog/`. Use frontmatter with `title`, `date`, and optional `tags` (and other fields your layout expects). The blog index and home page pull from these files automatically.
+Add `.mdx` files under `content/blog/`.
 
-## Deploy
+Frontmatter used by the app:
 
-The app is suitable for [Vercel](https://vercel.com) or any Node.js host. See [Next.js deployment docs](https://nextjs.org/docs/app/building-your-application/deploying) for details.
+- Required in practice: `title`, `date`, `summary`
+- Optional: `tags`, `draft`, `images`, `layout`, `canonicalUrl`, `authors`
+
+`draft: true` excludes a post from published listings.
+
+## Deployment
+
+This site is set up to deploy on [Vercel](https://vercel.com), and you can also deploy your own copy there easily.
+
+If you are remixing/forking this project, Vercel is the quickest path: import the repository, keep the default Next.js build settings, and deploy.
+
+## License
+
+This project uses a split licensing approach (also documented on the `/license` page):
+
+- **Written content and original images:** CC BY 4.0 (reuse/remix allowed with attribution)
+- **Code snippets in posts:** MIT License
+- **Not included for remixing:** personal branding/name/likeness and third-party assets that carry their own licenses

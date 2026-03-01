@@ -15,7 +15,7 @@ export function Nav({ wide: _wideProp }: { wide?: boolean }) {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="font-(family-name:--font-libre-baskerville) italic text-[1.05rem] text-warm no-underline tracking-[0.01em]"
+            className="font-(family-name:--font-libre-baskerville) italic text-[1.5rem] sm:text-[1.75rem] text-warm no-underline tracking-[0.01em]"
           >
             A<span className="text-accent not-italic">.</span>N
             <span className="text-accent not-italic">.</span>K

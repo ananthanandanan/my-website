@@ -33,7 +33,7 @@ export function Nav({ wide: _wideProp }: { wide?: boolean }) {
             ))}
             <li>
               <a
-                href="/feed.xml"
+                href="/feed"
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-[1rem] sm:text-[1.12rem] uppercase tracking-[0.08em] text-amber no-underline opacity-70 transition-opacity hover:opacity-100"
               >
                 <span

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Libre_Baskerville, DM_Mono } from "next/font/google";
 import "./globals.css";
 import { Layout } from "@/app/components/Layout";
+import { siteMetadata } from "@/lib/siteMetadata";
 
 const libreBaskerville = Libre_Baskerville({
   weight: ["400", "700"],
@@ -20,10 +21,14 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "A.N.K — K N Anantha Nandanan", template: "%s | A.N.K" },
-  description:
-    "Software engineer focused on scalable backend systems, DevOps, and applied AI. Writing about things I learn and systems I build.",
+  title: { default: siteMetadata.title, template: "%s | A.N.K" },
+  description: siteMetadata.description,
   openGraph: { type: "website" },
+  alternates: {
+    types: {
+      "application/rss+xml": "/feed.xml",
+    },
+  },
 };
 
 export default function RootLayout({

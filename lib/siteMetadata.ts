@@ -11,7 +11,7 @@ export const siteMetadata = {
   social: [
     { name: "GitHub", href: "https://github.com/ananthanandanan", icon: "github" },
     { name: "LinkedIn", href: "https://www.linkedin.com/in/de-blank", icon: "linkedin" },
-    { name: "Twitter", href: "https://x.com/Ananthan2k", icon: "twitter" },
+    { name: "X", href: "https://x.com/Ananthan2k", icon: "twitter" },
     { name: "Email", href: "mailto:ananthanandanan@gmail.com", icon: "email" },
   ],
   analytics: {

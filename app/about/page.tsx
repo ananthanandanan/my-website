@@ -5,7 +5,10 @@ const WRAP = "mx-auto max-w-[1150px] px-6 sm:px-8";
 
 const nowItems = [
   ["Building", "QuestCraft — LLM-powered assessment platform for teachers"],
-  ["Learning", "Distributed systems design, Rust for systems programming"],
+  [
+    "Learning",
+    "Mostly: find a real problem, build a real solution - while leveling up in agentic coding, system design, and DevOps.",
+  ],
   ["Reading", "Shadow Slave"],
   ["Location", "India — IST (UTC+5:30)"],
   ["Hobby", "Reading novels and listening to music"],
@@ -121,7 +124,7 @@ export default function AboutPage() {
               K N Anantha Nandanan
             </h1>
             <p className="type-meta mt-2 uppercase tracking-[0.14em] text-text-dim">
-              Backend Engineer · India
+              Product Engineer · India
             </p>
             <div className="type-meta mt-4 inline-flex items-center gap-2 rounded-full border border-[#2ecc7140] bg-[#2ecc7112] px-3.5 py-1.5 uppercase tracking-[0.12em] text-[#7bdc9f]">
               <span
@@ -181,6 +184,12 @@ export default function AboutPage() {
             here. I believe in small, sharp tools, slow reading, and shipping
             things that actually work. Outside of tech, I enjoy reading novels
             and listening to music.
+          </p>
+
+          <p className="type-lead mb-6 measure-readable text-text-mid">
+            If you want to connect, collaborate, or discuss work opportunities,
+            feel free to reach out. I&apos;m always open to meaningful
+            conversations and building useful things with good people.
           </p>
 
           <div className="type-meta mb-3 uppercase tracking-[0.18em] text-text-dim">

@@ -18,7 +18,13 @@ const socialIcons: Record<string, { path: string }> = {
 function SocialIcon({ icon }: { icon: string }) {
   const path = socialIcons[icon]?.path ?? "";
   return (
-    <svg width={11} height={11} fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+    <svg
+      width={11}
+      height={11}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
       <path d={path} />
     </svg>
   );
@@ -35,7 +41,7 @@ export function Hero() {
           className="inline-block h-px w-5 bg-accent opacity-60"
           aria-hidden
         />
-        Kerala, India · Backend Engineer
+        Product Engineer
       </div>
       <h1 className="type-hero font-(family-name:--font-libre-baskerville) mb-6 text-warm font-bold">
         Building software that

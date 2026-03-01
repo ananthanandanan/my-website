@@ -24,6 +24,18 @@ export const metadata: Metadata = {
   title: { default: siteMetadata.title, template: "%s | A.N.K" },
   description: siteMetadata.description,
   openGraph: { type: "website" },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
+  appleWebApp: {
+    title: "MyWebSite",
+  },
   alternates: {
     types: {
       "application/rss+xml": "/feed.xml",

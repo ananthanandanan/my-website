@@ -1,0 +1,12 @@
+<svg id="s5" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="8" fill="#0f0f0f"/>
+  <path d="M10 18 L10 10 L18 10" stroke="#2e2e2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 18 L54 10 L46 10" stroke="#2e2e2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M10 46 L10 54 L18 54" stroke="#2e2e2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M54 46 L54 54 L46 54" stroke="#2e2e2e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M16 48 Q32 20 48 48" fill="none" stroke="#4e8ef7" stroke-width="1.6" opacity="0.35"/>
+  <path d="M16 16 Q32 44 48 16" fill="none" stroke="#c9a84c" stroke-width="1.6" opacity="0.35"/>
+  <text x="32" y="37" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="14" font-weight="700" fill="#e8e4dc" letter-spacing="3">ANK</text>
+  <circle cx="23" cy="33.5" r="1.5" fill="#c9a84c"/>
+  <circle cx="41" cy="33.5" r="1.5" fill="#c9a84c"/>
+</svg>

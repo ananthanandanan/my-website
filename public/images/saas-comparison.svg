@@ -1,0 +1,308 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="960" height="520">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="960" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0c0c18"/>
+      <stop offset="100%" stop-color="#13131f"/>
+    </linearGradient>
+    <linearGradient id="leftBg" x1="0" y1="0" x2="0" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1c0d0d"/>
+      <stop offset="100%" stop-color="#150909"/>
+    </linearGradient>
+    <linearGradient id="rightBg" x1="0" y1="0" x2="0" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0b1f14"/>
+      <stop offset="100%" stop-color="#081510"/>
+    </linearGradient>
+    <linearGradient id="cardBg" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#0f2a1c"/>
+      <stop offset="100%" stop-color="#0a1f15"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="960" height="520" fill="url(#bg)"/>
+  <pattern id="dot" width="24" height="24" patternUnits="userSpaceOnUse">
+    <circle cx="12" cy="12" r="0.65" fill="#fff" opacity="0.07"/>
+  </pattern>
+  <rect width="960" height="520" fill="url(#dot)"/>
+
+  <!-- Title -->
+  <text x="480" y="32" text-anchor="middle"
+    font-family="'Courier New', monospace" font-size="11" fill="#ffffff"
+    opacity="0.28" letter-spacing="5">NAIL THE SAAS COMPARISON</text>
+
+  <!-- ═══════════════════════════════════════════
+       LEFT PANEL  x=24  y=48  w=428  h=454
+       center-x = 24 + 214 = 238
+  ════════════════════════════════════════════ -->
+  <rect x="24" y="48" width="428" height="454" rx="14"
+    fill="url(#leftBg)" stroke="#ff4444" stroke-width="1"
+    stroke-opacity="0.35" filter="url(#shadow)"/>
+
+  <!-- Badge  (w=196 centered at 238: x=238-98=140) -->
+  <rect x="140" y="66" width="196" height="26" rx="13"
+    fill="#ff3333" fill-opacity="0.12"
+    stroke="#ff4444" stroke-width="1" stroke-opacity="0.55"/>
+  <text x="238" y="83"
+    text-anchor="middle" font-family="'Courier New', monospace"
+    font-size="10.5" fill="#ff6666" letter-spacing="2">✗  THE BAD WAY</text>
+
+  <!-- Sub-title -->
+  <text x="238" y="114"
+    text-anchor="middle" font-family="Georgia, serif"
+    font-size="15" fill="#ff8888" font-style="italic">Feature Matrix Overload</text>
+
+  <!-- ── TABLE
+       x_left=40  x_right=436  total_w=396
+       Column centers (feature col 40..160, then 4 cols each 59px wide):
+         Feature:  x=40..160   cx=100
+         US:       x=160..219  cx=189.5
+         Comp A:   x=219..278  cx=248.5
+         Comp B:   x=278..357  cx=317.5
+         Comp C:   x=357..436  cx=396.5
+       Header y=130 h=26, rows h=22 from y=156
+  ── -->
+
+  <!-- Header -->
+  <rect x="40" y="130" width="396" height="26" rx="3"
+    fill="#2e1010" stroke="#ff4444" stroke-width="0.6" stroke-opacity="0.45"/>
+  <!-- Col dividers -->
+  <line x1="160" y1="130" x2="160" y2="156" stroke="#ff4444" stroke-width="0.5" stroke-opacity="0.35"/>
+  <line x1="219" y1="130" x2="219" y2="156" stroke="#ff4444" stroke-width="0.5" stroke-opacity="0.35"/>
+  <line x1="278" y1="130" x2="278" y2="156" stroke="#ff4444" stroke-width="0.5" stroke-opacity="0.35"/>
+  <line x1="357" y1="130" x2="357" y2="156" stroke="#ff4444" stroke-width="0.5" stroke-opacity="0.35"/>
+  <!-- Header labels -->
+  <text x="100"   y="147" text-anchor="middle" font-family="'Courier New', monospace" font-size="8" fill="#ff8888" letter-spacing="0.5">FEATURE</text>
+  <text x="189"   y="147" text-anchor="middle" font-family="'Courier New', monospace" font-size="8" fill="#ff8888" letter-spacing="0.5">US</text>
+  <text x="248"   y="147" text-anchor="middle" font-family="'Courier New', monospace" font-size="8" fill="#ff8888" letter-spacing="0.5">COMP A</text>
+  <text x="317"   y="147" text-anchor="middle" font-family="'Courier New', monospace" font-size="8" fill="#ff8888" letter-spacing="0.5">COMP B</text>
+  <text x="396"   y="147" text-anchor="middle" font-family="'Courier New', monospace" font-size="8" fill="#ff8888" letter-spacing="0.5">COMP C</text>
+
+  <!-- Rows (y starts at 156, height 22) -->
+  <!-- Helper: odd rows fill #1a0a0a, even #1e0c0c
+       tick chars at col-centers -->
+
+  <!-- Row 1 y=156 -->
+  <rect x="40" y="156" width="396" height="22" fill="#1a0a0a" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="156" x2="160" y2="178" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="156" x2="219" y2="178" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="156" x2="278" y2="178" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="156" x2="357" y2="178" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="171" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">SSO Login</text>
+  <text x="189" y="172" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="172" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="317" y="172" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="396" y="172" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 2 y=178 -->
+  <rect x="40" y="178" width="396" height="22" fill="#1e0c0c" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="178" x2="160" y2="200" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="178" x2="219" y2="200" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="178" x2="278" y2="200" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="178" x2="357" y2="200" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="193" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">API Access</text>
+  <text x="189" y="194" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="194" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="317" y="194" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="396" y="194" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+
+  <!-- Row 3 y=200 -->
+  <rect x="40" y="200" width="396" height="22" fill="#1a0a0a" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="200" x2="160" y2="222" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="200" x2="219" y2="222" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="200" x2="278" y2="222" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="200" x2="357" y2="222" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="215" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Custom Branding</text>
+  <text x="189" y="216" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="216" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="317" y="216" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="396" y="216" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 4 y=222 -->
+  <rect x="40" y="222" width="396" height="22" fill="#1e0c0c" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="222" x2="160" y2="244" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="222" x2="219" y2="244" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="222" x2="278" y2="244" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="222" x2="357" y2="244" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="237" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Analytics Dash</text>
+  <text x="189" y="238" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="238" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="317" y="238" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="396" y="238" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 5 y=244 -->
+  <rect x="40" y="244" width="396" height="22" fill="#1a0a0a" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="244" x2="160" y2="266" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="244" x2="219" y2="266" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="244" x2="278" y2="266" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="244" x2="357" y2="266" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="259" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Webhooks</text>
+  <text x="189" y="260" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="260" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="317" y="260" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="396" y="260" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 6 y=266 -->
+  <rect x="40" y="266" width="396" height="22" fill="#1e0c0c" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="266" x2="160" y2="288" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="266" x2="219" y2="288" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="266" x2="278" y2="288" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="266" x2="357" y2="288" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="281" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Mobile App</text>
+  <text x="189" y="282" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="282" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="317" y="282" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="396" y="282" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 7 y=288 -->
+  <rect x="40" y="288" width="396" height="22" fill="#1a0a0a" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="288" x2="160" y2="310" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="288" x2="219" y2="310" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="288" x2="278" y2="310" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="288" x2="357" y2="310" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="303" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Role Permissions</text>
+  <text x="189" y="304" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="304" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="317" y="304" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="396" y="304" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 8 y=310 -->
+  <rect x="40" y="310" width="396" height="22" fill="#1e0c0c" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="310" x2="160" y2="332" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="310" x2="219" y2="332" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="310" x2="278" y2="332" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="310" x2="357" y2="332" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="325" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Gamification</text>
+  <text x="189" y="326" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="326" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="317" y="326" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="396" y="326" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+
+  <!-- Row 9 y=332 -->
+  <rect x="40" y="332" width="396" height="22" fill="#1a0a0a" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="332" x2="160" y2="354" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="332" x2="219" y2="354" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="332" x2="278" y2="354" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="332" x2="357" y2="354" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="347" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">LMS Integration</text>
+  <text x="189" y="348" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="348" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="317" y="348" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="396" y="348" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+
+  <!-- Row 10 y=354 -->
+  <rect x="40" y="354" width="396" height="22" fill="#1e0c0c" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="160" y1="354" x2="160" y2="376" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="219" y1="354" x2="219" y2="376" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="278" y1="354" x2="278" y2="376" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <line x1="357" y1="354" x2="357" y2="376" stroke="#ff3333" stroke-width="0.25" stroke-opacity="0.2"/>
+  <text x="100" y="369" text-anchor="middle" font-family="'Courier New', monospace" font-size="7.5" fill="#cc8888">Offline Mode</text>
+  <text x="189" y="370" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="248" y="370" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+  <text x="317" y="370" text-anchor="middle" font-size="12" fill="#44ee88">✓</text>
+  <text x="396" y="370" text-anchor="middle" font-size="12" fill="#ff5555">✗</text>
+
+  <!-- Outer table border -->
+  <rect x="40" y="130" width="396" height="246" fill="none"
+    stroke="#ff3333" stroke-width="0.8" stroke-opacity="0.3"/>
+
+  <!-- Left panel captions (centered at 238) -->
+  <text x="238" y="413" text-anchor="middle"
+    font-family="Georgia, serif" font-size="13"
+    fill="#ff7777" font-style="italic">"So… which one should I pick?"</text>
+  <text x="238" y="434" text-anchor="middle"
+    font-family="'Courier New', monospace" font-size="9.5"
+    fill="#ff4444" opacity="0.45" letter-spacing="1">Audience is lost. Decision stalls.</text>
+
+  <!-- ═══════════════════════════════════════════
+       CENTER DIVIDER  x=480
+  ════════════════════════════════════════════ -->
+  <line x1="480" y1="56" x2="480" y2="464"
+    stroke="#ffffff" stroke-width="1" opacity="0.07"/>
+  <circle cx="480" cy="260" r="19"
+    fill="#13131f" stroke="#ffffff" stroke-width="1" stroke-opacity="0.12"/>
+  <text x="480" y="265" text-anchor="middle"
+    font-family="'Courier New', monospace" font-size="10"
+    fill="#ffffff" opacity="0.3" letter-spacing="1">VS</text>
+
+  <!-- ═══════════════════════════════════════════
+       RIGHT PANEL  x=508  y=48  w=428  h=454
+       center-x = 508 + 214 = 722
+  ════════════════════════════════════════════ -->
+  <rect x="508" y="48" width="428" height="454" rx="14"
+    fill="url(#rightBg)" stroke="#00cc66" stroke-width="1"
+    stroke-opacity="0.4" filter="url(#shadow)"/>
+
+  <!-- Badge (w=210 centered at 722: x=722-105=617) -->
+  <rect x="617" y="66" width="210" height="26" rx="13"
+    fill="#00cc66" fill-opacity="0.1"
+    stroke="#00cc66" stroke-width="1" stroke-opacity="0.55"/>
+  <text x="722" y="83"
+    text-anchor="middle" font-family="'Courier New', monospace"
+    font-size="10.5" fill="#00e676" letter-spacing="2">✓  THE RIGHT WAY</text>
+
+  <!-- Sub-title -->
+  <text x="722" y="114"
+    text-anchor="middle" font-family="Georgia, serif"
+    font-size="15" fill="#66ffaa" font-style="italic">3 Core Differentiators</text>
+
+  <!-- ── 3 CARDS
+       Card x=528  w=388
+       Card 1: y=130  h=98
+       Card 2: y=244  h=98
+       Card 3: y=358  h=98
+
+       Inside each card:
+         Accent bar: x=528 w=4
+         Icon circle: cx=568  cy=card_y+49  r=26
+         Title:  x=608  y=card_y+34
+         Body1:  x=608  y=card_y+55
+         Body2:  x=608  y=card_y+72
+  ── -->
+
+  <!-- Card 1 (y=130) -->
+  <rect x="528" y="130" width="388" height="98" rx="10"
+    fill="#0f2a1c" stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.45"/>
+  <rect x="528" y="130" width="4" height="98" rx="2" fill="#00cc66" opacity="0.75"/>
+  <circle cx="568" cy="179" r="26"
+    fill="#00cc66" fill-opacity="0.1"
+    stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.5"/>
+  <text x="568" y="186" text-anchor="middle" font-size="20">🎮</text>
+  <text x="608" y="163" font-family="Georgia, serif" font-size="13.5" fill="#00e676" font-weight="bold">Gamified Learning Engine</text>
+  <text x="608" y="183" font-family="Georgia, serif" font-size="11" fill="#7abf99">Quest-based curriculum no competitor offers —</text>
+  <text x="608" y="200" font-family="Georgia, serif" font-size="11" fill="#7abf99">built natively for teacher workflows.</text>
+
+  <!-- Card 2 (y=244) -->
+  <rect x="528" y="244" width="388" height="98" rx="10"
+    fill="#0f2a1c" stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.45"/>
+  <rect x="528" y="244" width="4" height="98" rx="2" fill="#00cc66" opacity="0.75"/>
+  <circle cx="568" cy="293" r="26"
+    fill="#00cc66" fill-opacity="0.1"
+    stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.5"/>
+  <text x="568" y="300" text-anchor="middle" font-size="20">📊</text>
+  <text x="608" y="277" font-family="Georgia, serif" font-size="13.5" fill="#00e676" font-weight="bold">Real-Time Class Analytics</text>
+  <text x="608" y="297" font-family="Georgia, serif" font-size="11" fill="#7abf99">Live student-level dashboards designed for</text>
+  <text x="608" y="314" font-family="Georgia, serif" font-size="11" fill="#7abf99">K-12 classrooms — not enterprise teams.</text>
+
+  <!-- Card 3 (y=358) -->
+  <rect x="528" y="358" width="388" height="98" rx="10"
+    fill="#0f2a1c" stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.45"/>
+  <rect x="528" y="358" width="4" height="98" rx="2" fill="#00cc66" opacity="0.75"/>
+  <circle cx="568" cy="407" r="26"
+    fill="#00cc66" fill-opacity="0.1"
+    stroke="#00cc66" stroke-width="1.2" stroke-opacity="0.5"/>
+  <text x="568" y="414" text-anchor="middle" font-size="20">🔌</text>
+  <text x="608" y="391" font-family="Georgia, serif" font-size="13.5" fill="#00e676" font-weight="bold">Native LMS Integration</text>
+  <text x="608" y="411" font-family="Georgia, serif" font-size="11" fill="#7abf99">One-click sync with Canvas, Schoology, and</text>
+  <text x="608" y="428" font-family="Georgia, serif" font-size="11" fill="#7abf99">Google Classroom. Truly zero friction.</text>
+
+  <!-- Right panel captions (centered at 722) -->
+  <text x="722" y="479" text-anchor="middle"
+    font-family="Georgia, serif" font-size="13"
+    fill="#00cc66" font-style="italic">"This is exactly what we need."</text>
+  <text x="722" y="500" text-anchor="middle"
+    font-family="'Courier New', monospace" font-size="9.5"
+    fill="#00aa55" opacity="0.45" letter-spacing="1">Clarity wins. Audience decides fast.</text>
+</svg>

@@ -1,0 +1,310 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 460" width="1000" height="460">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1000" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0d0d1a"/>
+      <stop offset="100%" stop-color="#111120"/>
+    </linearGradient>
+
+    <!-- Step fills -->
+    <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c0392b"/>
+      <stop offset="100%" stop-color="#922b21"/>
+    </linearGradient>
+    <linearGradient id="s2" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#cb4a0a"/>
+      <stop offset="100%" stop-color="#a03e08"/>
+    </linearGradient>
+    <linearGradient id="s3" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#1f8a4c"/>
+      <stop offset="100%" stop-color="#17693a"/>
+    </linearGradient>
+    <linearGradient id="s4" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#1a6faa"/>
+      <stop offset="100%" stop-color="#145888"/>
+    </linearGradient>
+    <linearGradient id="s5" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#7d3ca4"/>
+      <stop offset="100%" stop-color="#5e2d7c"/>
+    </linearGradient>
+    <linearGradient id="s6" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#c8960a"/>
+      <stop offset="100%" stop-color="#a07808"/>
+    </linearGradient>
+
+    <filter id="glow6">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+
+  <!-- ─── BACKGROUND ─── -->
+  <rect width="1000" height="460" fill="url(#bg)"/>
+  <pattern id="dot" width="22" height="22" patternUnits="userSpaceOnUse">
+    <circle cx="11" cy="11" r="0.6" fill="#fff" opacity="0.06"/>
+  </pattern>
+  <rect width="1000" height="460" fill="url(#dot)"/>
+
+  <!-- ─── TITLE ─── -->
+  <text x="500" y="32"
+    text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="11" fill="#ffffff" opacity="0.28" letter-spacing="5">
+    THE NARRATIVE ARC — SEQUENCE FOR CONTEXT
+  </text>
+
+  <!--
+  ═══════════════════════════════════════════════════════
+  STAIRCASE  GEOMETRY
+  ═══════════════════════════════════════════════════════
+  6 steps, left-to-right ascending.
+  Design baseline (bottom of all steps): y = 370
+  Step width: 110px each
+  Horizontal gap between steps: 10px
+  Starting x: 70
+
+    Step  x     top-y   height  color
+    1     70    280     90      red
+    2     190   245     125     orange
+    3     310   210     160     green
+    4     430   175     195     blue
+    5     550   140     230     purple
+    6     670   105     265     gold
+
+  Each step: rect from (x, top-y) to (x+110, 370)
+  Icon circle center: cx = x+55, cy = top-y + 30
+  Number:  x+55, top-y + 50
+  Label:   x+55, top-y + 68
+  Sub-label line1: x+55, top-y + 86  (only if enough room)
+  Sub-label line2: x+55, top-y + 100
+
+  Bottom caption box for each step:
+    Rect: x, 375, 110, 55
+    Text 1: x+55, 393
+    Text 2: x+55, 410
+  ═══════════════════════════════════════════════════════
+  -->
+
+  <!-- Axis labels -->
+  <!-- Y-axis label (vertical text, centered around y=230) -->
+  <text transform="translate(22, 235) rotate(-90)"
+    text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9.5" fill="#ffffff" opacity="0.22" letter-spacing="2">
+    AUDIENCE UNDERSTANDING ↑
+  </text>
+
+  <!-- X-axis label -->
+  <text x="500" y="446"
+    text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9.5" fill="#ffffff" opacity="0.22" letter-spacing="2">
+    PITCH PROGRESSION →
+  </text>
+
+  <!-- Dashed guide line (connecting step tops) -->
+  <polyline
+    points="125,280 245,245 365,210 485,175 605,140 725,105"
+    fill="none" stroke="#ffffff" stroke-width="1.2"
+    stroke-dasharray="5 5" stroke-opacity="0.15"/>
+  <!-- Arrow head on guide -->
+  <polygon points="735,101 718,106 726,116"
+    fill="#ffffff" opacity="0.15"/>
+
+  <!-- ── STEP 1 (x=70, top=280, h=90, color=red) ── -->
+  <rect x="70" y="280" width="110" height="90" rx="6"
+    fill="url(#s1)" filter="url(#shadow)"/>
+  <!-- Top shine -->
+  <rect x="70" y="280" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.14"/>
+  <!-- Icon -->
+  <text x="125" y="316" text-anchor="middle" font-size="20">🔥</text>
+  <!-- Step number -->
+  <text x="125" y="335" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">01</text>
+  <!-- Step name -->
+  <text x="125" y="353" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="13" fill="#ffffff" font-weight="bold">Problem</text>
+  <!-- Caption box -->
+  <text x="125" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#e87070" font-style="italic">Establish</text>
+  <text x="125" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#e87070" font-style="italic">the pain</text>
+
+  <!-- ── STEP 2 (x=190, top=245, h=125, color=orange) ── -->
+  <rect x="190" y="245" width="110" height="125" rx="6"
+    fill="url(#s2)" filter="url(#shadow)"/>
+  <rect x="190" y="245" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.14"/>
+  <text x="245" y="281" text-anchor="middle" font-size="20">📖</text>
+  <text x="245" y="300" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">02</text>
+  <text x="245" y="318" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="13" fill="#ffffff" font-weight="bold">Story</text>
+  <text x="245" y="340" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">Teacher's</text>
+  <text x="245" y="354" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">perspective</text>
+  <!-- Caption -->
+  <text x="245" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#e8a070" font-style="italic">Make it</text>
+  <text x="245" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#e8a070" font-style="italic">relatable</text>
+
+  <!-- ── STEP 3 (x=310, top=210, h=160, color=green) ── -->
+  <rect x="310" y="210" width="110" height="160" rx="6"
+    fill="url(#s3)" filter="url(#shadow)"/>
+  <rect x="310" y="210" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.14"/>
+  <text x="365" y="246" text-anchor="middle" font-size="20">💡</text>
+  <text x="365" y="265" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">03</text>
+  <text x="365" y="283" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="13" fill="#ffffff" font-weight="bold">Solution</text>
+  <text x="365" y="305" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">Introduce</text>
+  <text x="365" y="319" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">your product</text>
+  <!-- Caption -->
+  <text x="365" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#70e8a0" font-style="italic">Land the</text>
+  <text x="365" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#70e8a0" font-style="italic">product</text>
+
+  <!-- ── STEP 4 (x=430, top=175, h=195, color=blue) ── -->
+  <rect x="430" y="175" width="110" height="195" rx="6"
+    fill="url(#s4)" filter="url(#shadow)"/>
+  <rect x="430" y="175" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.14"/>
+  <text x="485" y="211" text-anchor="middle" font-size="20">📈</text>
+  <text x="485" y="230" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">04</text>
+  <text x="485" y="248" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="13" fill="#ffffff" font-weight="bold">Stats</text>
+  <text x="485" y="270" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">Validate with</text>
+  <text x="485" y="284" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">hard data</text>
+  <!-- Caption -->
+  <text x="485" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#70aaee" font-style="italic">Build</text>
+  <text x="485" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#70aaee" font-style="italic">credibility</text>
+
+  <!-- ── STEP 5 (x=550, top=140, h=230, color=purple) ── -->
+  <rect x="550" y="140" width="110" height="230" rx="6"
+    fill="url(#s5)" filter="url(#shadow)"/>
+  <rect x="550" y="140" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.14"/>
+  <text x="605" y="176" text-anchor="middle" font-size="20">⚔️</text>
+  <text x="605" y="195" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">05</text>
+  <text x="605" y="213" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="13" fill="#ffffff" font-weight="bold">Comparison</text>
+  <text x="605" y="235" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">Why you beat</text>
+  <text x="605" y="249" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffbb">alternatives</text>
+  <!-- Caption -->
+  <text x="605" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#cc88ee" font-style="italic">Seal the</text>
+  <text x="605" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#cc88ee" font-style="italic">argument</text>
+
+  <!-- ── STEP 6 (x=670, top=105, h=265, color=gold) ── -->
+  <!-- Glow outline for finale -->
+  <rect x="670" y="105" width="110" height="265" rx="6"
+    fill="none" stroke="#f1c40f" stroke-width="2.5"
+    stroke-opacity="0.5" filter="url(#glow6)"/>
+  <rect x="670" y="105" width="110" height="265" rx="6"
+    fill="url(#s6)" filter="url(#shadow)"/>
+  <rect x="670" y="105" width="110" height="6" rx="3"
+    fill="#ffffff" fill-opacity="0.2"/>
+  <text x="725" y="141" text-anchor="middle" font-size="22">🏆</text>
+  <text x="725" y="160" text-anchor="middle"
+    font-family="'Courier New', monospace"
+    font-size="9" fill="#ffffff" opacity="0.5">06</text>
+  <text x="725" y="180" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="14" fill="#ffffff" font-weight="bold">The Ask</text>
+  <text x="725" y="204" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffcc">State clearly</text>
+  <text x="725" y="218" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="9.5" fill="#ffffffcc">what you need</text>
+  <!-- Caption -->
+  <text x="725" y="391" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#f1c40f" font-style="italic">Close with</text>
+  <text x="725" y="407" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10.5" fill="#f1c40f" font-style="italic">conviction</text>
+
+  <!-- ─── HORIZONTAL BASELINE ─── -->
+  <line x1="60" y1="370" x2="800" y2="370"
+    stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.1"/>
+
+  <!-- ─── RIGHT-SIDE LEGEND / TAKEAWAY ─── -->
+  <rect x="830" y="130" width="148" height="200" rx="10"
+    fill="#ffffff" fill-opacity="0.04"
+    stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.1"/>
+  <text x="904" y="155" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#ffffff" opacity="0.5" letter-spacing="1">KEY INSIGHT</text>
+  <line x1="848" y1="163" x2="960" y2="163"
+    stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.12"/>
+  <text x="904" y="184" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">Each slide</text>
+  <text x="904" y="200" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">builds on the</text>
+  <text x="904" y="216" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">last — never</text>
+  <text x="904" y="232" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">skip ahead.</text>
+  <line x1="848" y1="248" x2="960" y2="248"
+    stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.12"/>
+  <text x="904" y="269" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">Context first,</text>
+  <text x="904" y="285" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="11" fill="#cccccc">then the ask.</text>
+  <text x="904" y="316" text-anchor="middle"
+    font-family="Georgia, serif"
+    font-size="10" fill="#f1c40f" opacity="0.7" font-style="italic">Earn the ask.</text>
+</svg>

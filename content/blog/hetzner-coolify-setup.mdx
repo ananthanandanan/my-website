@@ -1,0 +1,225 @@
+---
+title: Setting Up a Hetzner VPS with Coolify
+date: '2026-05-03'
+tags: ['self-host', 'coolify', 'hetzner', 'devops', 'linux']
+draft: false
+summary: A step-by-step guide to provisioning a Hetzner VPS using the Coolify marketplace image, hardening SSH, configuring DNS and HTTPS, locking down the firewall, and deploying your first app.
+images: []
+layout: PostLayout
+canonicalUrl: hetzner-coolify-setup
+authors: ['default']
+---
+
+If you've read my [VPS Setup Checklist](/blog/vps-setup-checklist), you know the general flow for getting a server ready. This post goes a step further — it's a focused walkthrough of setting up Hetzner specifically, using their **pre-packaged Coolify marketplace image**. That single choice skips the manual Docker install and the Coolify install script entirely, and gets you to a working PaaS dashboard in minutes. Well, perhaps 30 minutes.
+
+By the end, you'll have:
+
+- A Hetzner VPS running Coolify behind HTTPS
+- SSH locked down to key-only access
+- The Hetzner cloud firewall blocking everything except HTTP/HTTPS
+- A live test app deployed on a clean subdomain
+
+---
+
+## 📋 Prerequisites
+
+- A [Hetzner Cloud](https://www.hetzner.com/cloud) account
+- A domain name (this guide uses Namecheap, but any registrar works)
+- SSH key tooling on your local machine (`ssh-keygen`)
+
+---
+
+## 🖥️ 1. Provision the Server
+
+In the Hetzner Cloud console, create a new server:
+
+- **Location**: pick the region closest to you or your users
+- **Image**: under *Apps*, select **Coolify** — this ships with Ubuntu 24.04 and Docker pre-installed
+- **Type**: Shared CPU, x86 architecture. A CX22 (2 vCPU, 4 GB RAM) is a solid starting point
+- **SSH Key**: add your public key here (we'll generate it next)
+
+Before clicking *Create*, set up the SSH key so Hetzner injects it automatically.
+
+---
+
+## 🔐 2. Generate an SSH Key Pair
+
+On your local machine, generate a dedicated key for this server:
+
+```bash
+ssh-keygen -t ed25519 -f ~/.ssh/coolify
+```
+
+This creates two files: `~/.ssh/coolify` (private) and `~/.ssh/coolify.pub` (public).
+
+Copy the contents of `coolify.pub`:
+
+```bash
+cat ~/.ssh/coolify.pub
+```
+
+Paste that into the **SSH Keys** section of the Hetzner console, then finish creating the server.
+
+Once the server is up and you have its IP, connect:
+
+```bash
+ssh -i ~/.ssh/coolify root@<server-ip>
+```
+
+---
+
+## 🛡️ 3. Harden SSH — Disable Password Authentication
+
+With key-based access confirmed, disable password login to close off brute-force attacks.
+
+Edit the SSH config:
+
+```bash
+nano /etc/ssh/sshd_config
+```
+
+Find and update (or add) these lines:
+
+```text
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+```
+
+Restart SSH:
+
+```bash
+systemctl restart sshd
+```
+
+> ⚠️ **Do this before closing your current session.** Open a second terminal and verify you can still SSH in with your key before logging out.
+
+---
+
+## 🌐 4. Access the Coolify Dashboard
+
+The Coolify marketplace image starts the service automatically. Access the dashboard:
+
+```text
+http://<server-ip>:8000
+```
+
+You'll be prompted to create an admin account on the first visit. Complete the setup wizard — this is also where you register your instance.
+
+---
+
+## 🔗 5. Configure DNS and Enable HTTPS
+
+### Set the dashboard domain in Coolify
+
+In **Settings → Configuration**:
+
+- **App URL**: set to `https://coolify.yourdomain.com`
+
+In **Servers → localhost → Configuration**:
+
+- **Wildcard Domain**: set to `https://apps.yourdomain.com` (apps will be deployed as `appname.apps.yourdomain.com`)
+
+### Add DNS A records at your registrar (Namecheap)
+
+| Type | Host      | Value         |
+| ---- | --------- | ------------- |
+| A    | `coolify` | `<server-ip>` |
+| A    | `*.apps`  | `<server-ip>` |
+
+DNS propagation typically takes a few minutes.
+
+### Start the Traefik proxy in Coolify
+
+Go to **Servers → localhost → Proxy** and click **Start**.
+
+> ⚠️ **After saving the wildcard domain, you must restart the Traefik proxy** for it to pick up the new domain configuration. If it was already running, stop it and start it again.
+
+For a simple setup without Cloudflare, Traefik uses the **HTTP challenge** by default and will issue certificates automatically. However, if your DNS is behind Cloudflare (or you need wildcard certificates), the HTTP challenge won't work — you need the **DNS challenge** instead. See the section below.
+
+Once Traefik is running correctly, your dashboard will be accessible at `https://coolify.yourdomain.com`. Port 8000 is no longer needed.
+
+---
+
+### ☁️ Cloudflare Users: Switch to DNS Challenge
+
+Wildcard certificates (`*.apps.yourdomain.com`) **cannot** be issued via the HTTP challenge — Let's Encrypt requires the DNS-01 challenge for wildcards. If your domain is on Cloudflare, you also need a Cloudflare API token so Traefik can create the temporary `_acme-challenge` TXT records on your behalf.
+
+**Step 1 — Create a Cloudflare API token**
+
+In the Cloudflare dashboard, go to **My Profile → API Tokens → Create Custom Token** and set:
+
+- **Zone / Zone / Read**
+- **Zone / DNS / Edit**
+
+Scope the token to your specific domain for security. Save the token value — you won't see it again.
+
+**Step 2 — Update the Traefik config in Coolify**
+
+Go to **Servers → localhost → Proxy** and edit the Docker Compose configuration. Add the API token as an environment variable and switch the cert resolver to use the Cloudflare DNS provider:
+
+```yaml
+services:
+  traefik:
+    environment:
+      - CF_DNS_API_TOKEN=<your-cloudflare-api-token>
+    command:
+      # ... keep existing flags, replace or add these:
+      - '--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare'
+      - '--certificatesresolvers.letsencrypt.acme.dnschallenge.delaybeforecheck=0'
+      - '--certificatesresolvers.letsencrypt.acme.storage=/traefik/acme.json'
+```
+
+> 🚫 **Remove any HTTP challenge flags** (`acme.httpchallenge`) from the config. Running both challenges simultaneously causes certificate issuance to fail.
+
+**Step 3 — Restart the proxy**
+
+Save the config and restart Traefik from the Coolify UI. Monitor the proxy logs — silence in the logs after startup typically means the certificate was issued successfully.
+
+For a deeper dive into this configuration, see my [Coolify + Traefik + Cloudflare guide](/blog/setting-up-coolify-with-a-custom-domain-and-ssl-certificates-using-traefik-and-cloudflare-a-comprehensive-guide) or the [official Coolify DNS challenge docs](https://coolify.io/docs/knowledge-base/proxy/traefik/dns-challenge).
+
+---
+
+## 🔥 6. Lock Down the Hetzner Firewall
+
+Now that SSH is key-only and the dashboard is behind HTTPS, restrict inbound traffic at the network level using the Hetzner Cloud Firewall (under **Firewalls** in the console).
+
+Create a firewall with these **inbound** rules:
+
+| Protocol | Port | Source |
+| -------- | ---- | ------ |
+| TCP      | 80   | Any    |
+| TCP      | 443  | Any    |
+
+**Do not add rules for port 22 or 8000.** Blocking them at the firewall level means:
+
+- No one can reach the raw Coolify dashboard over HTTP
+- SSH is inaccessible from the public internet (your existing session and future connections via key still work if you're already inside — but for external hardening, consider pairing this with Hetzner's allowlist or a VPN for SSH)
+
+Apply the firewall to your server.
+
+---
+
+## 🧪 7. Deploy a Test Application
+
+To verify everything is wired up correctly, deploy a real service through Coolify.
+
+1. In Coolify, go to your project → **New Resource → Service**
+2. Search for **Activepieces** (an open-source automation tool)
+3. Set the domain to `activepieces.apps.yourdomain.com`
+4. Click **Deploy**
+
+Coolify will pull the image, start the container, and Traefik will issue a certificate for the subdomain. After a minute or two, visit:
+
+```text
+https://activepieces.apps.yourdomain.com
+```
+
+If it loads, your entire stack is working — Hetzner VPS → Coolify → Traefik → Let's Encrypt → your domain.
+
+---
+
+## 🎯 Conclusion
+
+The Hetzner marketplace image is what makes this setup so clean. You skip the Docker install, skip the Coolify install script, and go straight to configuration. From there it's a short chain: SSH hardening → dashboard access → DNS → HTTPS → firewall → first deploy.
+
+This pairs well with the [Coolify + Traefik + Cloudflare guide](/blog/setting-up-coolify-with-a-custom-domain-and-ssl-certificates-using-traefik-and-cloudflare-a-comprehensive-guide) if you want to go deeper on wildcard certificates and DNS challenge setup. Happy self-hosting! 🏠

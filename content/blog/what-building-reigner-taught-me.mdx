@@ -1,0 +1,245 @@
+---
+title: What Building Reigner Taught Me About Context, Cost, and Trust
+date: '2026-09-14'
+tags: ['ai-agents', 'llms', 'harness-engineering', 'rag', 'evals', 'python', 'open-source']
+draft: false
+summary: Reigner began as an attempt to make document Q&A agents cheaper, more traceable, and easier to understand. Building it changed how I think about orchestration, retrieval, citations, and where model capability is worth spending.
+images: []
+layout: PostLayout
+canonicalUrl: what-building-reigner-taught-me
+authors: ['default']
+---
+
+The system I built before Reigner had four agents. A router decided where a question should go, search and library agents gathered information, and a synthesis agent assembled the answer. The separation looked clean on a diagram. In practice, every handoff was another place to lose context, obscure a failure, or pay for a model call that did not improve the result.
+
+I eventually collapsed those roles into one agent with all the tools. That did not solve everything, but it made the remaining problems easier to see. The difficult part was no longer deciding which agent should speak next. It was deciding what the model should see, how much it should be allowed to retrieve, what should survive a long session, and how an answer could show its work.
+
+Those problems kept recurring whenever I built question-answering systems over domain-specific documents. Reigner started from two motives: I wanted a reusable base for that work, and I wanted to understand the harness by implementing one myself. It became a Python foundation that developers can shape into specialised, single-agent Q&A systems for a particular domain, such as audit records, medical literature, legal decisions, or product documentation. The developer prepares the knowledge, tools, and operating rules; the resulting system can serve the people working in that domain.
+
+I wrote the broader case for [harness engineering](/blog/from-prompt-engineering-to-harness-engineering) earlier this year. This is the more practical follow-up: the decisions I made in Reigner, what they bought me, and where I am still uncertain.
+
+## Where Efficiency Lives
+
+New model releases can make it seem as though the main engineering decision is which model name to put in a configuration file. Model capability certainly matters. But an application does not become reliable or economical merely because its model is more capable.
+
+The labs themselves are treating efficiency as a problem with several layers. Meta reported that the Llama 3 tokenizer produced [up to 15% fewer tokens than Llama 2](https://ai.meta.com/blog/meta-llama-3/). [Llama 4 uses mixture-of-experts layers](https://ai.meta.com/blog/llama-4-multimodal-intelligence/) so that a token activates only part of the model, reducing the computation used at inference time. More recently, Meta's [compute-optimal tokenization research](https://ai.meta.com/research/publications/compute-optimal-tokenization/) trained 988 models to study how token granularity changes the relationship between data and compute.
+
+That work happens inside model architecture and serving infrastructure. Reigner works above the API boundary, where the questions are different but related. How much context does this turn require? Is an identical tool call being repeated? Does every step need the strongest available model? Can a result be shortened without hiding the fact that it was shortened?
+
+The blacksmith analogy I had in mind while building Reigner is simple. I may not make the steel, but I can still shape the tool: its balance, its edge, and the grip that fits the work. In an LLM system, that shaping happens through the instructions, retrieval path, tool contracts, context policy, model selection, and tests around the model.
+
+## Keeping the Loop Visible
+
+I considered using an agent framework. Frameworks are useful when orchestration is the problem: routing between specialists, coordinating graphs, adding retries, or integrating a large ecosystem of components. Reigner's problem was narrower. I wanted to account for context and cost one iteration at a time.
+
+One Reigner iteration produces one model call and a stream of typed events such as tool calls, tool results, citations, compaction, and the final answer. The central loop is readable end to end, while the individual guardrails live in focused modules for truncation, caching, compaction, parallel reads, and nudges. I can follow a run through the source and identify what entered the prompt and why.
+
+That visibility mattered more to me than a visual graph or a collection of prebuilt nodes. It also followed from the earlier four-agent experience: for this problem, continuity of context was more valuable than role separation.
+
+This is a choice about fit, not a general argument against frameworks or multiple agents. A workflow that needs independent specialists or complex coordination should probably use those abstractions. Reigner deliberately gives up that leverage in exchange for a smaller surface that I can inspect and test.
+
+## Compiling Knowledge Before Querying It
+
+A common document-Q&A pipeline chunks files, embeds the chunks, retrieves the nearest matches, and places the top results in a prompt. Reigner starts elsewhere. Ingestion acts as a **compile step**: the developer declares the information that matters, and a one-time pass turns raw PDF, HTML, or text sources into structured artifacts addressed by `(entity, version, section)`. The agent queries those artifacts at runtime rather than reopening raw documents.
+
+<figure className="my-10 overflow-x-auto">
+<svg viewBox="0 0 760 382" role="img" aria-label="Two workflows: raw sources are compiled once into an artifact store; each later question is answered by an agent that reads the store and returns a cited answer" style={{ width: '100%', minWidth: '700px', height: 'auto' }}>
+  <defs>
+    <marker id="compile-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)" />
+    </marker>
+  </defs>
+
+  <g fontFamily="var(--font-mono), monospace">
+    <text x="28" y="27" fill="currentColor" fillOpacity="0.72" fontSize="14">Compile once</text>
+    <path d="M124 22 H730" stroke="currentColor" strokeOpacity="0.16" />
+
+    <g fill="none" stroke="currentColor" strokeOpacity="0.3" strokeWidth="1.5">
+      <rect x="36" y="65" width="150" height="66" rx="4" />
+      <rect x="30" y="59" width="150" height="66" rx="4" fill="var(--bg)" />
+      <rect x="24" y="53" width="150" height="66" rx="4" fill="var(--bg)" />
+      <rect x="282" y="48" width="196" height="82" rx="6" />
+      <path d="M568 55 C568 42 736 42 736 55 V126 C736 139 568 139 568 126 Z" />
+      <ellipse cx="652" cy="55" rx="84" ry="12" fill="var(--bg)" />
+      <path d="M568 91 C568 104 736 104 736 91" />
+    </g>
+
+    <g fill="currentColor">
+      <text x="99" y="82" textAnchor="middle" fontSize="16" fontWeight="600">Raw sources</text>
+      <text x="380" y="80" textAnchor="middle" fontSize="16" fontWeight="600">Schema extraction</text>
+      <text x="652" y="82" textAnchor="middle" fontSize="16" fontWeight="600">Artifact store</text>
+    </g>
+    <g fill="currentColor" fillOpacity="0.54" fontSize="12.5">
+      <text x="99" y="103" textAnchor="middle">PDF / HTML / text</text>
+      <text x="380" y="102" textAnchor="middle">validate + provenance</text>
+      <text x="652" y="105" textAnchor="middle">entity / version</text>
+      <text x="652" y="123" textAnchor="middle">section address</text>
+    </g>
+
+    <g fill="none" stroke="var(--accent)" strokeWidth="2" markerEnd="url(#compile-arrow)">
+      <path d="M188 89 H268" />
+      <path d="M492 89 H554" />
+    </g>
+
+    <text x="28" y="198" fill="currentColor" fillOpacity="0.72" fontSize="14">Query repeatedly</text>
+    <path d="M154 193 H730" stroke="currentColor" strokeOpacity="0.16" />
+
+    <g fill="none" stroke="currentColor" strokeOpacity="0.3" strokeWidth="1.5">
+      <rect x="24" y="226" width="160" height="82" rx="41" />
+      <rect x="292" y="226" width="176" height="82" rx="6" />
+      <path d="M552 226 H736 V316 H552 Z" />
+      <path d="M712 226 V250 H736" />
+    </g>
+
+    <g fill="currentColor">
+      <text x="104" y="260" textAnchor="middle" fontSize="16" fontWeight="600">Question</text>
+      <text x="380" y="260" textAnchor="middle" fontSize="16" fontWeight="600">Agent loop</text>
+      <text x="644" y="260" textAnchor="middle" fontSize="16" fontWeight="600">Cited answer</text>
+    </g>
+    <g fill="currentColor" fillOpacity="0.54" fontSize="12.5">
+      <text x="104" y="283" textAnchor="middle">from a domain user</text>
+      <text x="380" y="283" textAnchor="middle">bounded reads</text>
+      <text x="644" y="282" textAnchor="middle">source + locator</text>
+      <text x="644" y="300" textAnchor="middle">+ cited value</text>
+    </g>
+
+    <g fill="none" stroke="var(--accent)" strokeWidth="2" markerEnd="url(#compile-arrow)">
+      <path d="M198 267 H278" />
+      <path d="M482 267 H538" />
+      <path d="M652 151 C652 184 485 176 415 216" strokeDasharray="5 5" />
+    </g>
+    <text x="544" y="179" fill="var(--accent)" fontSize="12.5">read by stable address</text>
+
+    <path d="M24 345 H736" stroke="currentColor" strokeOpacity="0.12" />
+    <text x="24" y="371" fill="currentColor" fillOpacity="0.48" fontSize="13">Interpret once. Retrieve small, traceable artifacts during the live conversation.</text>
+  </g>
+</svg>
+</figure>
+
+The useful property here is not complete determinism; the model can still choose a different search path. It is that the knowledge has stable addresses. An artifact can be cited back to its source, compared with the same artifact from another version, and named explicitly in an eval. That gives me something firmer to test than a similarity score alone.
+
+Compilation also moves interpretation away from the query path. Extraction happens once, where I can inspect the output, adjust the schema, and run it again. Later questions can retrieve smaller, purpose-built representations instead of repeatedly asking a model to interpret the same raw pages.
+
+There is a cost to this decision. It assumes the corpus has enough structure to justify a schema. Financial filings, legal judgments, and versioned product documentation often do. A heterogeneous or open-domain collection may not. If the real task is to find material that is vaguely related to a phrase, embeddings are a better fit, and Reigner's search interface leaves room for that kind of backend. I do not see compiled artifacts and vector retrieval as universal competitors; they preserve different information and suit different questions.
+
+## Turning Citation Discipline Into a Test
+
+Prompt instructions still matter in Reigner. The agent is told to cite its sources and to avoid unsupported claims. I did not want that instruction to be the only enforcement mechanism, especially for numbers that can look plausible when they are wrong.
+
+Reigner's tools preserve provenance, and the agent can register a citation containing a source, locator, and value. The deterministic `faithfulness` check extracts numeric values from the final answer and compares them with the registered citation values. The core of the implementation is deliberately ordinary:
+
+```python
+claims = _numbers(run.answer_text)
+cited = [n for c in run.citations for n in _numbers(str(c.value))]
+for claim in claims:
+    if not _is_cited(claim, cited):
+        return CheckResult("faithfulness", "fail", f"claim {claim:g} not cited")
+```
+
+The comparison handles scale differences, so `$67.0 billion` can match a stored value of `67000000000`. It ignores bare calendar years and digits embedded inside identifiers to avoid some predictable false positives.
+
+This is a bounded check. It verifies numeric correspondence, not the meaning of an entire sentence. A number could coincide with the wrong citation, and unsupported prose can pass because there is no number to inspect. An LLM-based judge could be added through the same eval interface, but Reigner does not currently ship one.
+
+I prefer stating that limit directly. The check does not prove that an answer is true. It catches a narrower and still expensive class of failure: a model presenting an uncited figure as fact. It also turns that failure into something CI can report instead of something I have to notice while rereading a transcript.
+
+## Spending Model Capability Deliberately
+
+Cost in an agent loop is not only the provider's price per token. It is also how much context is sent, how many iterations the task takes, how often tools repeat work, and which model handles each iteration. I wanted those choices to be visible in the design rather than discovered later in a billing dashboard.
+
+Reigner's main model-selection mechanism is **oracle escalation**. A cheaper default model can handle routine retrieval and narrowing. When it reaches a step that appears to need stronger reasoning, it can call `escalate_to_oracle` with a reason. The following iteration uses the configured oracle model, and then the loop returns to the default.
+
+This resembles the broader direction of model-routing research, including [RouteLLM](https://arxiv.org/abs/2406.18665), although Reigner's mechanism is simpler and initiated by the agent itself. An escalation event makes the decision visible for later inspection. Reigner does not yet judge automatically whether the extra spend was warranted; that would require an eval designed for the decision rather than just the answer.
+
+<figure className="my-10 overflow-x-auto">
+<svg viewBox="0 0 760 306" role="img" aria-label="An execution trace where the default model handles routine turns, escalates one reasoning turn to a stronger model with a recorded reason, and then automatically returns to the default" style={{ width: '100%', minWidth: '700px', height: 'auto' }}>
+  <defs>
+    <marker id="oracle-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--amber)" />
+    </marker>
+    <marker id="return-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)" />
+    </marker>
+  </defs>
+
+  <g fontFamily="var(--font-mono), monospace">
+    <text x="28" y="28" fill="currentColor" fillOpacity="0.72" fontSize="14">Model choice across a run</text>
+    <path d="M230 23 H732" stroke="currentColor" strokeOpacity="0.16" />
+
+    <path d="M54 205 H718" fill="none" stroke="currentColor" strokeOpacity="0.18" strokeWidth="2" />
+
+    <g fill="var(--accent)">
+      <circle cx="82" cy="205" r="9" />
+      <circle cx="146" cy="205" r="9" />
+      <circle cx="210" cy="205" r="9" />
+      <circle cx="274" cy="205" r="9" />
+      <circle cx="558" cy="205" r="9" />
+      <circle cx="622" cy="205" r="9" />
+      <circle cx="686" cy="205" r="9" />
+    </g>
+
+    <g fill="currentColor" fillOpacity="0.48" fontSize="12.5" textAnchor="middle">
+      <text x="82" y="234">1</text>
+      <text x="146" y="234">2</text>
+      <text x="210" y="234">3</text>
+      <text x="274" y="234">4</text>
+      <text x="558" y="234">6</text>
+      <text x="622" y="234">7</text>
+      <text x="686" y="234">8</text>
+    </g>
+
+    <text x="54" y="174" fill="var(--accent)" fontSize="15" fontWeight="600">Default model</text>
+    <text x="54" y="258" fill="currentColor" fillOpacity="0.46" fontSize="12.5">routine retrieval and narrowing</text>
+
+    <rect x="310" y="56" width="250" height="94" rx="6" fill="var(--amber)" fillOpacity="0.08" stroke="var(--amber)" strokeOpacity="0.72" strokeWidth="1.5" />
+    <text x="332" y="89" fill="var(--amber)" fontSize="16" fontWeight="600">Oracle · turn 5</text>
+    <text x="332" y="116" fill="currentColor" fillOpacity="0.58" fontSize="12.5">one turn on the stronger model</text>
+    <text x="332" y="137" fill="currentColor" fillOpacity="0.58" fontSize="12.5">reason logged</text>
+
+    <path d="M286 199 C301 178 320 160 345 150" fill="none" stroke="var(--amber)" strokeWidth="2" markerEnd="url(#oracle-arrow)" />
+    <path d="M530 150 C543 166 552 181 557 194" fill="none" stroke="var(--accent)" strokeWidth="2" markerEnd="url(#return-arrow)" />
+
+    <text x="279" y="166" fill="var(--amber)" fontSize="12.5" textAnchor="end">escalate</text>
+    <text x="568" y="169" fill="var(--accent)" fontSize="12.5">return</text>
+
+    <path d="M28 275 H732" stroke="currentColor" strokeOpacity="0.12" />
+    <text x="28" y="299" fill="currentColor" fillOpacity="0.48" fontSize="13">A stronger model is selected for one step, then the default resumes.</text>
+  </g>
+</svg>
+</figure>
+
+The surrounding controls are less visible but just as important. Identical read-only tool calls can reuse a per-session cache. Independent reads issued together can run concurrently, reducing latency even when they do not reduce token count. Tool outputs have individual size limits because a search result and a document section do not need the same budget. The prompt is also split into stable and dynamic parts so providers that support prefix caching can reuse the stable instructions and tool definitions.
+
+These mechanisms do not guarantee that the cheaper model will always be sufficient or that every escalation will be wise. They make the trade visible and measurable. That is a more useful starting point than applying one expensive model to every turn and trying to optimize the bill afterwards.
+
+## Failures That Became Guardrails
+
+Some of Reigner's more specific rules came from following long sessions and watching them degrade.
+
+The clearest example was compaction. Reigner begins compacting history as the context budget crosses 80%, 90%, and 95%. In my first approach, the summary could consume the scratchpad notes the agent had written to preserve its findings. After compaction, the agent would retrieve the same material and reconstruct work it had already done. The context was smaller, but the system had become less efficient.
+
+The fix was to keep notes outside compactable conversation history. That sounds obvious after the fact. It was not obvious while treating the prompt as one growing sequence of messages. The distinction only became clear after I watched the agent forget its own work.
+
+Tool output produced another version of the same problem. A response that silently returns its first ten matches looks complete to a model. Reigner's default tools therefore describe their own boundaries:
+
+```json
+{ "content": "...", "offset": 0, "limit": 4000,
+  "has_more": true, "total_size": 18320 }
+```
+
+A finite-context model cannot infer whether an output is complete unless the tool says so. Fields such as `has_more`, `truncated`, `available_keys`, and `missing_keys` give it enough information to continue, narrow the request, or stop.
+
+Reigner also injects occasional strategic reminders and a one-time wrap-up nudge after consecutive tool errors. The one-time latch matters: without it, a mechanism intended to end an unproductive run can itself become a loop. These are small details, but agent reliability has often turned out to be a collection of small, explicit decisions rather than one clever prompt.
+
+## What I Would Change
+
+The most difficult part of Reigner's current approach is the schema. The compile step asks a developer to decide what matters in the documents before asking many real questions. In practice, understanding a corpus and designing its representation inform each other. You often discover the right schema by querying an incomplete one.
+
+The guided `reigner init` flow reduces that initial work, but it does not remove the underlying tension. If I revisited the design, I would explore a more permissive first ingestion followed by a schema that becomes stricter as real queries expose what deserves stable representation.
+
+I also have not run the comparison that would give the retrieval argument more weight: compiled artifacts and a strong embedding pipeline evaluated on the same corpus, with the same questions and model. My experience gives me reasons to prefer compiled knowledge for structured domains. It does not make that preference a general result.
+
+Those boundaries are part of how I now think about the project. Reigner is intended for question answering over prepared knowledge, not autonomous action, code execution, or multi-agent coordination. Keeping that scope narrow allowed me to spend time on the parts I wanted to understand: context pressure, tool behavior, provenance, evaluation, and cost across a run.
+
+The main lesson was not that every agent should be built this way. It was that the model is only one material in the system. The engineering work is in deciding how that material should be used, what it should be allowed to see, and how its output earns trust for a particular job.
+
+[Reigner](https://github.com/Construct-Lab/reigner) is open source under the MIT licence. The [documentation](https://construct-lab.github.io/reigner/) covers the architecture and the eleven guardrails in more detail, and the library installs with `uv add 'reigner[anthropic,ingestion]'`.

@@ -6,15 +6,15 @@ const cardClassName =
   "flex flex-col gap-3 bg-surface p-6 text-inherit no-underline transition-colors hover:bg-surface-2";
 
 export function ProjectCard({ project }: { project: Project }) {
-  const live = project.deployed !== false;
+  const available = project.status !== "archived";
   const content = (
     <>
       <div className="type-meta flex items-center gap-1.5 uppercase tracking-widest text-text-dim">
         <span
-          className={`h-1.5 w-1.5 rounded-full ${live ? "bg-[#2ecc71] animate-pulse" : "bg-text-dim"}`}
+          className={`h-1.5 w-1.5 rounded-full ${available ? "bg-[#2ecc71] animate-pulse" : "bg-text-dim"}`}
           aria-hidden
         />
-        {live ? "Live" : "Archive"}
+        {project.status}
       </div>
       <div className="type-title font-(family-name:--font-libre-baskerville)">
         {project.title}
